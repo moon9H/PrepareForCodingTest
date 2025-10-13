@@ -16,9 +16,13 @@ for test_case in range(1, 11):
     while operator : 
         postfix.append(operator.pop())
     
-    sum = 0
+    operand = []
     for i in postfix :
         if i.isdigit() :
-            sum += int(i)
+            operand.append(int(i))
+        else :
+            A = operand.pop()
+            B = operand.pop()
+            operand.append(A + B)
 
-    print(f"#{test_case} {sum}")
+    print(f"#{test_case} {operand[0]}")
