@@ -1,24 +1,16 @@
-for test_case in range(1, 10 + 1):
-    check_len = int(input())
-    palindrome_cnt = 0
-    word_puzzle = []
-    for _ in range(8) :
-        line = list(input())
-        word_puzzle.append(line)
-    
-    for w in word_puzzle :
-        for j in range(0, 8 - check_len + 1) :
-            word = ''.join(w[j : j + check_len])
-            if word == word[::-1] :
-                palindrome_cnt += 1
-    
-    for i in range(8) :
-        w = []
-        for j in range(8) :
-            w.append(word_puzzle[j][i])
-        for j in range(0, 8 - check_len + 1) :
-            word = ''.join(w[j : j + check_len])
-            if word == word[::-1] :
-                palindrome_cnt += 1
-    
-    print(f"#{test_case} {palindrome_cnt}")
+for tc in range(1, 11):
+    N = int(input().strip())
+    board = [input().strip() for _ in range(8)]             # 8줄
+    cols  = [''.join(col) for col in zip(*board)]           # 전치
+
+    def count_palins(lines, L):
+        cnt = 0
+        for s in lines:
+            for i in range(8 - L + 1):
+                seg = s[i:i+L]
+                if seg == seg[::-1]:
+                    cnt += 1
+        return cnt
+
+    ans = count_palins(board, N) + count_palins(cols, N)
+    print(f"#{tc} {ans}")
