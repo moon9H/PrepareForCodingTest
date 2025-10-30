@@ -1,29 +1,29 @@
-INF = float('inf')
-MINUS_INF = float('-inf')
-def min_max_index(arr) :
-    min = INF
-    max = MINUS_INF
-    min_index = 0
-    max_index = 0
-    for i in range(len(arr)) :
-        if min > arr[i] :
-            min = arr[i]
-            min_index = i
-        if max < arr[i] :
-            max = arr[i]
-            max_index = i
-    return max, max_index, min, min_index
-
 T = 10
 for test_case in range(1, T + 1):
     dump = int(input())
-    dump_cnt = 0
     histogram = list(map(int ,input().split()))
-    highest, high_i, lowest, low_i = min_max_index(histogram)
-    while (highest - lowest > 1 and dump_cnt < dump) :
-        histogram[high_i] -= 1
-        histogram[low_i] += 1
-        dump_cnt += 1
-        highest, high_i, lowest, low_i = min_max_index(histogram)
+
+    MAX_H = 100
+    freq = [0 for _ in range(MAX_H + 1)]
+    mn_value = MAX_H
+    mx_value = 0
     
-    print(f"#{test_case} {highest - lowest}")
+    for h in histogram :
+        freq[h] += 1
+        mn_value = h if h < mn_value else mn_value
+        mx_value = h if h > mx_value else mx_value
+
+    while dump > 0 and mx_value - mn_value > 1 :
+        freq[mx_value] -= 1
+        freq[mx_value - 1] += 1
+        if freq[mx_value] == 0 :
+            mx_value -= 1
+        
+        freq[mn_value] -= 1
+        freq[mn_value + 1] += 1
+        if freq[mn_value] == 0 :
+            mn_value += 1
+        
+        dump -= 1
+    
+    print(f"#{test_case} {mx_value - mn_value}")
