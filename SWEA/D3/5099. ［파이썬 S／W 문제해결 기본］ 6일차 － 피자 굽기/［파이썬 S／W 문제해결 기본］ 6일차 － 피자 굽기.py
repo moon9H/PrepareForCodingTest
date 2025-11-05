@@ -3,19 +3,19 @@ from collections import deque
 T = int(input())
 for test_case in range(1, T + 1):
     capacity, numPizza = map(int, input().split())
-    cheeseTopping = list(map(int, input().split()))
+    pizza = list(map(int, input().split()))
     for i in range(numPizza) :
-        cheeseTopping[i] = (cheeseTopping[i], i + 1)
-    firepit = deque(cheeseTopping[0 : capacity])
-    remain = numPizza - capacity
-    
+        pizza[i] = (pizza[i], i + 1)
+    firepit = deque(pizza[0 : capacity])
+    next_pizza = capacity
+
     while(len(firepit) > 1) :
         cheese, idx = firepit.popleft()
         cheese //= 2
         if cheese == 0 :
-            if remain :
-                firepit.append(cheeseTopping[numPizza - remain])
-                remain -= 1
+            if next_pizza < numPizza :
+                firepit.append(pizza[next_pizza])
+                next_pizza += 1
         else :
             firepit.append((cheese, idx))
 
