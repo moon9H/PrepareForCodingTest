@@ -1,10 +1,9 @@
 import sys
 input = sys.stdin.readline
-
 from collections import deque
 
 N = int(input())
-heap = deque([0])
+heap = [0]
 for _ in range(N) :
     x = int(input())
     if x == 0 :
