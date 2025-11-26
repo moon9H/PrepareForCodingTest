@@ -6,18 +6,18 @@ from collections import deque
 def bfs(start) :
     global visited, graph, nodeCnt
     q = deque([start])
-    visited[start - 1] = True
+    visited[start] = True
     
     while q :
         u = q.popleft()
         for v in range(1, nodeCnt + 1) :
-            if graph[u][v] == 1 and not visited[v - 1] :
-                visited[v - 1] = True
+            if graph[u][v] == 1 and not visited[v] :
+                visited[v] = True
                 q.append(v)
 
 nodeCnt, edgeCnt = map(int, input().split())
 graph = [[0] * (nodeCnt + 1) for _ in range(nodeCnt + 1)]
-visited = [False] * (nodeCnt)
+visited = [False] * (nodeCnt + 1)
 for _ in range(edgeCnt) :
     i, j = map(int, input().split())
     graph[i][j] = 1
@@ -25,7 +25,7 @@ for _ in range(edgeCnt) :
 
 count = 0
 for node in range(1, nodeCnt + 1) :
-    if not visited[node - 1] :
+    if not visited[node] :
         bfs(node)
         count += 1
 
