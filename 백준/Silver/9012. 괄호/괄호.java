@@ -1,30 +1,27 @@
-import java.util.Scanner;
+import java.io.*;
 import java.util.Stack;
 
 public class Main {
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		int T = sc.nextInt();
+	static boolean isVPS(String paren){
 		Stack<Character> stack = new Stack<>();
-		first : for (int i = 0; i < T; i++){
-			String parenthesis = sc.next();
-			for (int j = 0; j < parenthesis.length(); j++){
-				if (parenthesis.charAt(j) == '('){
-					stack.push(parenthesis.charAt(j));
-				} else {
-					if (stack.isEmpty()){
-						System.out.println("NO");
-						continue first;
-					} else {
-						stack.pop();
-					}
-				}
+		for (char c : paren.toCharArray()){
+			if (c == '('){
+				stack.push(c);
+			} else {
+				if (stack.isEmpty()) return false;
+				stack.pop();
 			}
-			if (stack.isEmpty())
-				System.out.println("YES");
-			else
-				System.out.println("NO");
-			stack.clear();
 		}
+		return stack.isEmpty();
+    }
+	public static void main(String[] args) throws Exception{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
+		int T = Integer.parseInt(br.readLine());
+		for (int i = 0; i < T; i++){
+			String parenthesis = br.readLine();
+			sb.append(isVPS(parenthesis) ? "YES" : "NO").append("\n");
+		}
+		System.out.println(sb.toString());
 	}
 }
