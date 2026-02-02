@@ -1,55 +1,39 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class Main {
-	public static void main(String[] args) throws IOException{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringBuilder sb = new StringBuilder();
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		
-		int N = Integer.parseInt(st.nextToken());
-		int M = Integer.parseInt(st.nextToken());
-		
-		int [][] board = new int[N][N];
-		int [][] pos = new int[M][4];
-		
-		for (int i = 0; i < N; i++) {
-			st = new StringTokenizer(br.readLine());
-			for (int j = 0; j < N; j++) {
-				board[i][j] = Integer.parseInt(st.nextToken());
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+
+		// 표의 크기
+		int N = sc.nextInt();
+		// 합을 구해야 하는 줄 수
+		int M = sc.nextInt();
+
+		int[][] arr = new int[N + 1][N + 1];
+
+		for (int i = 1; i <= N; i++) {
+			for (int j = 1; j <= N; j++) {
+				arr[i][j] = arr[i - 1][j] + arr[i][j - 1] - arr[i - 1][j - 1] + sc.nextInt();
 			}
 		}
-		
-		for (int i = 0; i < M; i++) {
-			st = new StringTokenizer(br.readLine());
-			for (int j = 0; j < 4; j++) {
-				pos[i][j] = Integer.parseInt(st.nextToken()) - 1;
-			}
+
+		int sum = 0;
+
+		for (int i = 1; i <= M; i++) {
+			int A = sc.nextInt();
+			int B = sc.nextInt();
+			int C = sc.nextInt();
+			int D = sc.nextInt();
+
+			sum = arr[C][D] - arr[A-1][D] - arr[C][B-1] + arr[A-1][B-1];
+
+			System.out.println(sum);
+			
 		}
-		
-		int [][] partialSum = new int [N][N];
-		for (int i = 0; i < N; i++) {
-			partialSum[i][0] = board[i][0];
-			for (int j = 1; j < N; j++) {
-				partialSum[i][j] = partialSum[i][j - 1] + board[i][j];
-			}
-		}
-		
-		for (int i = 0; i < M; i++) {
-			int sum = 0;
-			int row1 = pos[i][0], row2 = pos[i][2];
-			int col1 = pos[i][1], col2 = pos[i][3];
-			for (int j = row1; j < row2 + 1; j++) {
-				if (col1 == 0) {
-					sum += partialSum[j][col2];
-				} else {
-					sum += partialSum[j][col2] - partialSum[j][col1 - 1];
-				}
-			}
-			sb.append(sum).append("\n");
-		}
-		System.out.println(sb.toString());
+
+		sc.close();
 	}
+
 }
