@@ -1,43 +1,24 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.util.Scanner;
 
 public class Main {
-	public static void main(String[] args) throws IOException{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringBuilder sb = new StringBuilder();
-		
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		int N = Integer.parseInt(st.nextToken());
-		int M = Integer.parseInt(st.nextToken());
-		st = new StringTokenizer(br.readLine());
-		int [] arr = new int[N];
-		for (int i = 0; i < N; i++) {
-			arr[i] = Integer.parseInt(st.nextToken());
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int N = sc.nextInt();
+		int M = sc.nextInt();
+		int[] arr = new int[N+1];
+		arr[0] = 0;
+		arr[1] = sc.nextInt();
+		for (int i=2; i<=N; i++) {
+			arr[i] = arr[i-1] + sc.nextInt();
 		}
 		
-		int [] partialSum = new int[N];
-		partialSum[0] = arr[0];
-		for (int i = 1; i < N; i++) {
-			partialSum[i] += partialSum[i - 1] + arr[i];
+		int sum = 0; 
+		for (int i=1; i<=M; i++) {
+			int A = sc.nextInt();
+			int B = sc.nextInt();
+			sum = arr[B] - arr[A-1];
+			System.out.println(sum);
 		}
-		
-		for (int cnt = 0; cnt < M; cnt++) {
-			st = new StringTokenizer(br.readLine());
-			int i = Integer.parseInt(st.nextToken());
-			int j = Integer.parseInt(st.nextToken());
-			if (i == j) {
-				sb.append(arr[i - 1]).append("\n");
-			} else {
-				if (i == 1) {
-					sb.append(partialSum[j - 1]).append("\n");
-				} else {
-					sb.append(partialSum[j - 1] - partialSum[i - 2]).append("\n");	
-				}
-			}
-		}
-		System.out.println(sb.toString());
+		sc.close();
 	}
 }
