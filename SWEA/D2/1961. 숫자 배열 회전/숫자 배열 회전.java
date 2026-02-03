@@ -17,40 +17,22 @@ public class Solution {
                     arr[i][j] = Integer.parseInt(st.nextToken());
                 }
             }
-
-            // 90도 회전
-            int[][] turn90 = new int[N][N];
-            for (int i = 0; i < N; i++){
-                for (int j = 0; j < N; j++){
-                    turn90[i][j] = arr[N - 1 - j][i];
-                }
-            }
-            // 180도 회전
-            int[][] turn180 = new int[N][N];
-            for (int i = 0; i < N; i++){
-                for (int j = 0; j < N; j++){
-                    turn180[i][j] = arr[N - 1 - i][N - 1 - j];
-                }
-            }
-            // 270도 회전
-            int[][] turn270 = new int[N][N];
-            for (int i = 0; i < N; i++){
-                for (int j = 0; j < N; j++){
-                    turn270[i][j] = arr[j][N - 1 - i];
-                }
-            }
+            
             sb.append("#").append(testCase).append(" ").append("\n");
             for (int i = 0; i < N; i++){
+                // 90도 회전
                 for (int j = 0; j < N; j++){
-                    sb.append(turn90[i][j]);
+                    sb.append(arr[N - 1 - j][i]);
                 }
                 sb.append(" ");
+                // 180도 회전
                 for (int j = 0; j < N; j++){
-                    sb.append(turn180[i][j]);
+                    sb.append(arr[N - 1 - i][N - 1 - j]);
                 }
                 sb.append(" ");
+                // 270도 회전
                 for (int j = 0; j < N; j++){
-                    sb.append(turn270[i][j]);
+                    sb.append(arr[j][N - 1 - i]);
                 }
                 sb.append("\n");
             }
