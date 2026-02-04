@@ -9,43 +9,30 @@ public class Solution {
 		if (current[0] == 0) {
 			return current;
 		}
-		int[][] dir = {{0, 1}, {0, -1}, {-1, 0}};
-		
-		int[] leftPos = new int[2];
-		leftPos[0] = current[0] + dir[0][0];
-		leftPos[1] = current[1] + dir[0][1];
-		
-		int[] rightPos = new int[2];
-		rightPos[0] = current[0] + dir[1][0];
-		rightPos[1] = current[1] + dir[1][1];
-		
-		int[] fowardPos = new int[2];
-		fowardPos[0] = current[0] + dir[2][0];
-		fowardPos[1] = current[1] + dir[2][1];
-		
-		if (leftPos[0] >= 0 && leftPos[0] < 100 && leftPos[1] >= 0 && leftPos[1] < 100
-				&& arr[leftPos[0]][leftPos[1]] != 0 && !visited[leftPos[0]][leftPos[1]]) {
-			visited[leftPos[0]][leftPos[1]] = true;
-			int result[] = dfs(arr, visited, leftPos);
+
+		// 사다리 타기이므로 왼쪽이나 오른쪽에 길이 있다면 해당 방향으로 탐색을 진행해야 함.
+		if (current[1] - 1 >= 0 && arr[current[0]][current[1] - 1] != 0 && !visited[current[0]][current[1] - 1]) {
+			visited[current[0]][current[1] - 1] = true;
+			current[1] -= 1;
+			int result[] = dfs(arr, visited, current);
 			if (result != null) {
 				return result;
 			}
-		} else if (rightPos[0] >= 0 && rightPos[0] < 100 && rightPos[1] >= 0 && rightPos[1] < 100
-				&& arr[rightPos[0]][rightPos[1]] != 0 && !visited[rightPos[0]][rightPos[1]]) {
-			visited[rightPos[0]][rightPos[1]] = true;
-			int result[] = dfs(arr, visited, rightPos);
+		} else if (current[1] + 1 < 100 && arr[current[0]][current[1] + 1] != 0 && !visited[current[0]][current[1] + 1]) {
+			visited[current[0]][current[1] + 1] = true;
+			current[1] += 1;
+			int result[] = dfs(arr, visited, current);
 			if (result != null) {
 				return result;
 			}
-		} else if (fowardPos[0] >= 0 && fowardPos[0] < 100 && fowardPos[1] >= 0 && fowardPos[1] < 100
-				&& arr[fowardPos[0]][fowardPos[1]] != 0 && !visited[fowardPos[0]][fowardPos[1]]) {
-			visited[fowardPos[0]][fowardPos[1]] = true;
-			int result[] = dfs(arr, visited, fowardPos);
+		} else if (current[0] - 1 >= 0 && arr[current[0] - 1][current[1]] != 0 && !visited[current[0] - 1][current[1]]) {
+			visited[current[0] - 1][current[1]] = true;
+			current[0] -= 1;
+			int result[] = dfs(arr, visited, current);
 			if (result != null) {
 				return result;
 			}
 		}
-		
 		return null;
 	}
 	
@@ -72,7 +59,6 @@ public class Solution {
 					finalPos[1] = i;
 				}
 			}
-			
 			sb.append("#").append(testCase).append(" ").append(dfs(data, visited, finalPos)[1]).append("\n");
 		}
 		System.out.println(sb.toString());
