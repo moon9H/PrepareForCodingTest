@@ -6,7 +6,6 @@ import java.util.StringTokenizer;
 public class Solution {
     private static int maxScore;
     private static int[][] ingredients;
-    private static int[] result;
     private static int limitCalorie, N;
 
     public static void main(String[] args) throws IOException {
@@ -26,33 +25,22 @@ public class Solution {
                 ingredients[i][1] = Integer.parseInt(st.nextToken());
             }
 
-            for (int i = 1; i <= N; i++){
-                result = new int[i];
-                combination(0, 0, i);
-            }
+            combination(0, 0, 0);
 
             sb.append("#").append(tc).append(" ").append(maxScore).append("\n");
         }
         System.out.println(sb);
     }
 
-    public static void combination(int cnt, int start, int r){
-        if (cnt ==  r){
-            int scoreSum = 0;
-            int calorieSum = 0;
-            for (int i : result){
-                scoreSum += ingredients[i][0];
-                calorieSum += ingredients[i][1];
-            }
+    public static void combination(int cnt, int calorieSum, int scoreSum){
+        if (calorieSum > limitCalorie) return;
+        maxScore = Math.max(maxScore, scoreSum);
+        if (cnt == N) return;
 
-            if (calorieSum < limitCalorie) maxScore = Math.max(scoreSum, maxScore);
+        combination(cnt + 1,
+                calorieSum + ingredients[cnt][1],
+                scoreSum + ingredients[cnt][0]);
 
-            return;
-        }
-
-        for (int i = start; i < N; i++){
-            result[cnt] = i;
-            combination(cnt + 1, i + 1, r);
-        }
+        combination(cnt + 1, calorieSum, scoreSum);
     }
 }
