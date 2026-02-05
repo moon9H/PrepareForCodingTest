@@ -39,14 +39,14 @@ public class Solution {
 			}
 			permutation(0);
 			sb.append("#").append(testCase).append(" ").
-			append(loseCnt).append(" ").append(winCnt).append("\n");
+			append(winCnt).append(" ").append(loseCnt).append("\n");
 		}
 		System.out.println(sb);
 	}
 	
 	public static void permutation(int cnt) {
 		if (cnt == 9) {
-			playGame(numbers, gyuyoungCards);
+			playGame(gyuyoungCards, numbers);
 			return;
 		}
 		
@@ -65,11 +65,11 @@ public class Solution {
 		for (int i = 0; i < 9; i++) {
 			if (gyuyoung[i] > inyoung[i]) {
 				gyuyoungScore += gyuyoung[i] + inyoung[i];
-			} else if (gyuyoung[i] < inyoung[i]) {
+			} else {
 				inyoungScore += gyuyoung[i] + inyoung[i];
 			}
 		}
 		if (gyuyoungScore > inyoungScore) winCnt++;
-		else if (gyuyoungScore < inyoungScore) loseCnt++;
+		else loseCnt++;
 	}
 }
