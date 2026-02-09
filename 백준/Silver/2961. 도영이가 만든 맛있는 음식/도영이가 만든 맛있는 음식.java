@@ -4,32 +4,37 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int[][] ingredients;
-    static int N, diff;
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        diff = 1_000_000_001;
-        ingredients = new int[N][2];            // 0 : S(신맛 - 곱), 1 : B(쓴맛 - 합)
-        for (int i = 0; i < N; i++){
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            ingredients[i][0] = Integer.parseInt(st.nextToken());
-            ingredients[i][1] = Integer.parseInt(st.nextToken());
-        }
+	public static int N, diff = Integer.MAX_VALUE; // diff : 신맛과 쓴맛의 차이 
+	public static int[] x, y;
+	public static void main(String[] args) throws IOException {
+		// 신맛 = 사용 재료 신맛의 곱 
+		// 쓴맛 = 사용 재료 쓴맛의 합
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine()); 
+		
+		x = new int[N]; // 신맛 배열
+		y = new int[N]; // 쓴맛 배열 
+		for (int i = 0; i < N; i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+			x[i] = Integer.parseInt(st.nextToken());
+			y[i] = Integer.parseInt(st.nextToken());
+		}
+		
+		dfs(0, 1, 0, false); // ** 곱은 1부터 시작 
+		System.out.print(diff);
+	}
 
-        dfs(0, 1, 0, 0);
-        System.out.println(diff);
-    }
-
-    static void dfs(int cnt, int sour, int bitter, int select){
-        if (cnt == N){
-            if (select != 0)
-                diff = Math.min(Math.abs(sour - bitter), diff);
-            return;
-        }
-
-        dfs(cnt + 1, sour * ingredients[cnt][0], bitter + ingredients[cnt][1], select + 1);
-        dfs(cnt + 1, sour, bitter, select);
-
-    }
+	public static void dfs(int cnt, int a, int b, boolean isSelected) {
+		if (cnt == N) {
+			if (isSelected) { // 선택된 경우에는 a-b의 절댓값과 diff 중 최솟값 선택 
+				diff = Math.min(diff, Math.abs(a-b));
+			}
+			return; 
+		}
+		
+	
+		dfs(cnt+1, a*x[cnt], b+y[cnt], true);
+		
+		dfs(cnt+1, a, b, isSelected);
+	}
 }
