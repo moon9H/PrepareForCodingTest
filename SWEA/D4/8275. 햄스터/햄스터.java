@@ -5,9 +5,8 @@ import java.util.*;
 
 public class Solution {
     private static int N, X, M, maxSum;
-    private static int[] input, result;
+    private static int[] input, result, best;
     private static int[][] records;
-    private static Stack<int[]> list;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder sb = new StringBuilder();
@@ -20,8 +19,8 @@ public class Solution {
             M = Integer.parseInt(st.nextToken());
             records = new int[M][3];
             input = new int[X + 1];
-            list = new Stack<>();
             maxSum = -1;
+            best = null;
             for (int i = 0; i <= X; i++) input[i] = i;
             for (int i = 0; i < M; i++){
                 st = new StringTokenizer(br.readLine());
@@ -32,12 +31,12 @@ public class Solution {
             result = new int[N];
             combination(0);
             String ans = "";
-            if (list.isEmpty()){
+            if (best == null){
                 ans = "-1";
             }
             else {
                 StringBuilder sb2 = new StringBuilder();
-                for (int a : list.pop()) sb2.append(a).append(" ");
+                for (int a : best) sb2.append(a).append(" ");
                 ans = sb2.toString();
             }
             sb.append("#").append(tc).append(" ").append(ans).append("\n");
@@ -69,7 +68,7 @@ public class Solution {
 
                 if (rSum > maxSum){
                     maxSum = rSum;
-                    list.push(result.clone());
+                    best = result.clone();
                 }
             }
             return;
