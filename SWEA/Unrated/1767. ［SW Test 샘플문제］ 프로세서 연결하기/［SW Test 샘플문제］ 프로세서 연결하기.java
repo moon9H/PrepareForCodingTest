@@ -8,7 +8,6 @@ import java.util.StringTokenizer;
 public class Solution {
     private static int N, maxCore, minSum;
     private static int[][] board;
-    private static boolean[][] cantConnect;
     private static List<int[]> corePos;
     private final static int[] dirRow = {-1, 0, 1, 0};
     private final static int[] dirCol = {0, 1, 0, -1};
@@ -21,7 +20,6 @@ public class Solution {
         for (int t = 1; t <= T; t++) {
             N = Integer.parseInt(br.readLine());
             board = new int[N][N];
-            cantConnect = new boolean[N][N];
             corePos = new ArrayList<>();
             maxCore = 0;
             minSum = Integer.MAX_VALUE;
@@ -31,7 +29,6 @@ public class Solution {
                 for (int j = 0; j < N; j++) {
                     board[i][j] = Integer.parseInt(st.nextToken());
                     if (board[i][j] == 1) {
-                        cantConnect[i][j] = true;
                         if (!(i == 0 || i == N - 1 || j == 0 || j == N - 1)) {
                             corePos.add(new int[]{i, j});
                         }
@@ -64,9 +61,9 @@ public class Solution {
  
         for (int i = 0; i < 4; i++) {
             if (linePossible(r, c, i)) {
-                int dist = connect(r, c, i, true);							// 해당 방향으로 전선 연결 가능
+                int dist = connect(r, c, i, 1);							// 해당 방향으로 전선 연결 가능
                 setLine(coreIdx + 1, connectedCore + 1, lineSum + dist);
-                connect(r, c, i, false); 									// 전선 연결 해제
+                connect(r, c, i, 0); 									// 전선 연결 해제
             }
         }
  
@@ -78,20 +75,20 @@ public class Solution {
         int nc = curCol + dirCol[dir];
  
         while (nr >= 0 && nr < N && nc >= 0 && nc < N) {
-            if (cantConnect[nr][nc]) return false;
+            if (board[nr][nc] == 1) return false;
             nr += dirRow[dir];
             nc += dirCol[dir];
         }
         return true;
     }
  
-    static int connect(int curRow, int curCol, int dir, boolean state) {
+    static int connect(int curRow, int curCol, int dir, int state) {
         int nr = curRow + dirRow[dir];
         int nc = curCol + dirCol[dir];
         int lineLength = 0;
  
         while (nr >= 0 && nr < N && nc >= 0 && nc < N) {
-            cantConnect[nr][nc] = state;
+            board[nr][nc] = state;
             lineLength++;
             nr += dirRow[dir];
             nc += dirCol[dir];
