@@ -6,7 +6,6 @@ import java.util.StringTokenizer;
 public class Main {
 	private static int N, total = 0;
 	private static int[] strength, weight;
-	private static boolean[] isBroken;
 
 	public static void main(String[] args) throws IOException {
 		// 왼쪽 계란부터 선택하며 다른 계란 중에 하나와 부딪혀서 내구도 감소시킴
@@ -26,17 +25,14 @@ public class Main {
 		}
 //		System.out.println(strength[0]+ " " + weight[0]);
 
-		// 계란의 파손 여부 저장
-		isBroken = new boolean[N];
-
 		// 재귀 함수
-		dfs(0, isBroken);
+		dfs(0);
 
 		// 출력
 		System.out.println(total);
 	}
 
-	public static void dfs(int idx, boolean[] isBroken) {
+	public static void dfs(int idx) {
 		if (idx == N) {
 			int count = 0;
 
@@ -49,15 +45,8 @@ public class Main {
 			return;
 		}
 
-		// 깨진 계란 개수가 n-1이면 종료
-//		int n = 0;
-//		for (int j = 0; j < N; j++) {
-//			if (isBroken[j])
-//				n++;
-//		}
-
 		if (strength[idx] <= 0 || allOthersBroken(idx)) {
-			dfs(idx + 1, isBroken);
+			dfs(idx + 1);
 			return;
 		}
 
@@ -69,13 +58,14 @@ public class Main {
 			strength[idx] -= weight[i];
 			strength[i] -= weight[idx];
 
-			dfs(idx + 1, isBroken);
+			dfs(idx + 1);
 
 			strength[idx] += weight[i];
 			strength[i] += weight[idx];
 		}
 	}
 	
+	// 현재 인덱스를 제외하고 계란이 모두 깨졌는지 확인하는 함수 
 	private static boolean allOthersBroken(int currentIdx) {
 	    for (int i = 0; i < N; i++) {
 	        if (i != currentIdx && strength[i] > 0) return false;
