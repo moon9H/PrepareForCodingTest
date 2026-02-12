@@ -3,51 +3,61 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
+/* 색종이 만들기 */
 public class Main {
-	private static int[][] board;
-	private static int white, blue;
-	public static void main(String[] args) throws IOException{
-		// 입력 처리 파트
+	private static int N, B = 0, W = 0; // B: 파란색, W: 하얀색 개수
+	private static int[][] arr;
+
+	// 0: 하얀색, 1: 파란색
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		int N = Integer.parseInt(br.readLine());
-		board = new int[N][N];
-		white = blue = 0;
+		N = Integer.parseInt(br.readLine());
+		arr = new int[N][N];
+
 		for (int i = 0; i < N; i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine());
+			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 			for (int j = 0; j < N; j++) {
-				board[i][j] = Integer.parseInt(st.nextToken());
+				arr[i][j] = Integer.parseInt(st.nextToken());
 			}
 		}
 		
-		// 로직 시작
-		dfs(N, 0 ,0);
-		System.out.println(white);
-		System.out.println(blue);
+		solve(0, 0, N);
+		System.out.println(W);
+		System.out.println(B);
 	}
 	
-	static void dfs(int size, int row, int col) {
-		int b = 0;
-		int w = 0;
-		for (int i = row; i < row + size; i++) {
-			for (int j = col; j < col + size; j++) {
-				if (board[i][j] == 0) w++;
-				else b++;
+	public static void solve(int r, int c, int size) {
+		// isSame이 true이면 바로 리턴 
+		if (isSame(r, c, size)) {
+			return;
+		}
+		
+		// isSame이 false면 구간 분할하여 반복 
+		int newSize = size / 2;
+	    solve(r, c, newSize);                         // 왼쪽 위
+	    solve(r, c + newSize, newSize);               // 오른쪽 위
+	    solve(r + newSize, c, newSize);               // 왼쪽 아래
+	    solve(r + newSize, c + newSize, newSize);     // 오른쪽 아래
+	}
+
+	public static boolean isSame(int r, int c, int size) {
+		int firstValue = arr[r][c];
+
+		for (int i = r; i < r + size; i++) {
+			for (int j = c; j < c + size; j++) {
+				if (arr[i][j] != firstValue) {
+					return false;
+				}
 			}
 		}
 		
-		if (b == size * size) {
-			blue++;
-			return;
+		// isSame이 true를 반환하기 전 색상 개수 업데이트 
+		if (firstValue == 0) {
+			W++;
+		} else {
+			B++;
 		}
-		
-		if (w ==  size * size) {
-			white++;
-			return;
-		}
-		
-		dfs(size / 2, row, col);
-		dfs(size / 2, row, col + size / 2);
-		dfs(size / 2, row + size / 2, col);
-		dfs(size / 2, row + size / 2, col + size / 2);
+		return true;
+
 	}
 }
