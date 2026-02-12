@@ -1,43 +1,57 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Solution {
-    private static int N, B, minSum;
-    private static int[] heights;
-    private static boolean[] isSelected;
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
-        int T = Integer.parseInt(br.readLine());
-        for (int tc = 1; tc <= T; tc++){
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            N = Integer.parseInt(st.nextToken());
-            B = Integer.parseInt(st.nextToken());
-            heights = new int[N];
-            minSum = Integer.MAX_VALUE;
-            st = new StringTokenizer(br.readLine());
-            for (int i = 0; i < N; i++) {
-                heights[i] = Integer.parseInt(st.nextToken());
-            }
+	private static int N, B; // 테스트케이스, 사람수, 목표 높이
+	private static int[] arr; // 키 배열
+	private static int res, gap = 0; // 최소값을 담을 변수, 두 값의 차이
+	// 키의 합을 모두 더해서 목표 높이보다 큰 최소 값까지 작은 거부터 빼면 되지 않을까... => 안 됨 
+	// 한 명의 키가 조건에 맞는 최적의 해가 될 수 있으므로 조합으로 풀어야 함 ㅜㅜㅠ 
 
-            dfs(0, 0);
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int T = Integer.parseInt(br.readLine());
+		for (int test_case = 1; test_case <= T; test_case++) {
+			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+			N = Integer.parseInt(st.nextToken());
+			B = Integer.parseInt(st.nextToken());
 
-            sb.append('#').append(tc).append(' ').append(minSum - B).append('\n');
+			arr = new int[N];
+
+			st = new StringTokenizer(br.readLine(), " ");
+			for (int i = 0; i < N; i++) {
+				arr[i] = Integer.parseInt(st.nextToken());
+			}
+			
+			res = Integer.MAX_VALUE;
+			findMinValue(0, 0);
+			gap = res - B;
+
+			System.out.println("#" + test_case + " " + gap);
+		}
+	}
+
+	public static void findMinValue(int idx, int sum) {
+		// [가지치기] 이미 현재 최솟값(res)보다 합이 커졌다면 더 더해볼 필요가 없음
+        if (sum >= res) return;
+
+        // 목표 높이 B를 넘었다면 최솟값 갱신
+        if (sum >= B) {
+            res = Math.min(res, sum);
+            // B와 딱 맞는 값을 찾았다면 더 이상 탐색 불필요
+            if (res == B) return; 
         }
-        System.out.println(sb);
-    }
 
-    static void dfs(int index, int sum){
-        if (sum > minSum) return;
+        // 모든 직원을 다 확인한 경우
+        if (idx == N) return;
 
-        if (index == N){
-            if (sum >= B) minSum = sum;
-            return;
-        }
-
-        dfs(index + 1, sum + heights[index]);
-        dfs(index + 1, sum);
+        // 1. 현재 직원을 포함하는 경우
+        findMinValue(idx + 1, sum + arr[idx]);
+        
+        // 2. 현재 직원을 포함하지 않는 경우
+        findMinValue(idx + 1, sum);
     }
 }
