@@ -3,61 +3,50 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
+/* 색종이 - 2 */
 public class Main {
-	static int[][] board;
-	public static void main(String[] args) throws IOException{
+	// 길이는 true인 면에서 상/하/좌/우 true 아닌 면으로 전환되는 곳의 합..
+	static boolean[][] paper = new boolean[102][102]; 
+	
+	static int[] dr = { -1, 1, 0, 0 };
+	static int[] dc = { 0, 0, -1, 1 };
+
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		int N = Integer.parseInt(br.readLine());
-		int[][] papers = new int[N][2];
-		int minRow = 101, minCol = 101;
-		int maxRow = 0, maxCol = 0;
+
+		// 색종이 붙이기
 		for (int i = 0; i < N; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
-			papers[i][0] = Integer.parseInt(st.nextToken());
-			papers[i][1] = Integer.parseInt(st.nextToken());
-			
-			minRow = Math.min(papers[i][0], minRow);
-			minCol = Math.min(papers[i][1], minCol);
-			maxRow = Math.max(papers[i][0] + 10, maxRow);
-			maxCol = Math.max(papers[i][1] + 10, maxCol);
-		}
-		
-		int size = (maxRow - minRow > maxCol - minCol) ? maxRow - minRow : maxCol - minCol;
-		int mappingSize = 1;
-		while (mappingSize < size) {
-			mappingSize *= 4;
-		}
-		
-		board = new int[mappingSize][mappingSize];
-		for (int[] p : papers) {
-			int r = p[0] - minRow + 1;
-			int c = p[1] - minCol + 1;
-			for (int i = r; i < r + 10; i++) {
-				for (int j = c; j < c + 10; j++) {
-					board[i][j] = 1;
+			int x = Integer.parseInt(st.nextToken());
+			int y = Integer.parseInt(st.nextToken());
+
+			for (int r = x; r < x + 10; r++) {
+				for (int c = y; c < y + 10; c++) {
+					paper[r][c] = true;
 				}
 			}
 		}
-		
-		int ans = 0;
-		
-		int[] dr = {-1, 1, 0, 0};
-		int[] dc = {0, 0, -1, 1};
-		
-		for (int i = 0; i < mappingSize; i++) {
-		    for (int j = 0; j < mappingSize; j++) {
-		        if (board[i][j] == 1) { // 색종이가 있는 칸이라면
-		            for (int k = 0; k < 4; k++) {
-		                int nr = i + dr[k];
-		                int nc = j + dc[k];
-		                // 주변이 0(빈 공간)이면 그 면은 둘레다!
-		                if (nr < 0 || nr >= mappingSize + 2 || nc < 0 || nc >= mappingSize + 2 || board[nr][nc] == 0) {
-		                    ans++;
-		                }
-		            }
-		        }
-		    }
+
+		int length = 0;
+
+		for (int r = 1; r <= 100; r++) {
+			for (int c = 1; c <= 100; c++) {
+				if (!paper[r][c])
+					continue;
+
+				// 4방 탐색
+				for (int d = 0; d < 4; d++) {
+					int nr = r + dr[d];
+					int nc = c + dc[d];
+					
+					// true인 면에서 true가 아닌 면으로 전환되는 지점의 합 = 길이 
+					if (!paper[nr][nc])
+						length++;
+				}
+			}
 		}
-		System.out.println(ans);
+
+		System.out.println(length);
 	}
 }
