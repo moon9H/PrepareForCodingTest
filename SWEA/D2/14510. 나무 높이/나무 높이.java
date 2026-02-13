@@ -1,64 +1,64 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.StringTokenizer;
 
 public class Solution {
-	// 홀수날에 높이 1, 짝수날에 2 => 모든 나무가 가장 큰 나무과 높이가 같아지는 최소 일수
-	// 나무의 개수 N은 2 이상 100 이하
-	// 짝수날의 개수가 홀수날 개수보다 하나 많을 때 최적의 선택
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		int T = Integer.parseInt(br.readLine()); 
 
-		for (int test_case = 1; test_case <= T; test_case++) {
-			int N = Integer.parseInt(br.readLine());
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
+        int T = Integer.parseInt(br.readLine());
 
-			List<Integer> arr = new ArrayList<>();
+        for (int tc = 1; tc <= T; tc++) {
+            int N = Integer.parseInt(br.readLine());
+            int[] trees = new int[N];
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int tallest = 0;
+            for (int i = 0; i < N; i++) {
+                trees[i] = Integer.parseInt(st.nextToken());
+                tallest = Math.max(tallest, trees[i]);
+            }
 
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			int max = 0;
-			for (int i = 0; i < N; i++) {
-				int h = Integer.parseInt(st.nextToken());
-				arr.add(h);
-				if (h > max)
-					max = h; 
-			}
+            int minDays = Integer.MAX_VALUE;
 
-			int odd = 0;
-			int even = 0;
+            for (int target = tallest; target <= tallest + 1; target++) {
+                int oddTrees = 0;  // 1만큼 더 자라야 하는 횟수 (홀수날용)
+                int evenTrees = 0; // 2만큼 더 자라야 하는 횟수 (짝수날용)
 
-			for (int i = 0; i < N; i++) {
-				int diff = max - arr.get(i);
-				if (diff == 0)
-					continue;
+                for (int i = 0; i < N; i++) {
+                    int diff = target - trees[i];
+                    if (diff == 0) continue;
 
-				odd += diff % 2;
-				even += diff / 2;
-			}
+                    evenTrees += diff / 2;
+                    oddTrees += diff % 2;
+                }
 
-			// 짝수날보다 홀수날이 같거나 더 많아지는 순간까지 홀수날에 + 2 
-			while (even > odd + 1) {
-				even--;
-				odd += 2;
-			}
+                // 2를 1+1로 쪼개서 균형 맞추기 (짝수날이 너무 많이 남는 경우 방지)
+                if (evenTrees > oddTrees) {
+                    while (Math.abs(evenTrees - oddTrees) > 1) {
+                        evenTrees--;
+                        oddTrees += 2;
+                    }
+                }
 
-			int res = 0;
-			if (odd > even) {
-				// 홀수날이 더 많으면: 1, 2, 1, 2, 1... 순서이므로
-				res = odd * 2 - 1;
-			} else if (even > odd) {
-				// 짝수날이 더 많으면: (짝수날이 1개 더 많은 경우만 남음))
-				res = even * 2;
-			} else {
-				res = odd + even;
-			}
+                int ans = 0;
+                if (oddTrees > evenTrees) {
+                    // 홀수날이 더 많으면 홀-짝-홀-짝-홀... 순서로 끝남
+                    ans = oddTrees * 2 - 1;
+                } else if (evenTrees > oddTrees) {
+                    // 짝수날이 더 많으면 (위의 조절로 최대 1개 차이) 짝수날에 끝남
+                    ans = evenTrees * 2;
+                } else {
+                    // 개수가 같으면 모든 날을 다 씀
+                    ans = oddTrees + evenTrees;
+                }
+                
+                minDays = Math.min(minDays, ans);
+            }
 
-			System.out.println("#" + test_case + " " + res);
-		}
-	}
+            sb.append('#').append(tc).append(' ').append(minDays).append('\n');
+        }
+        System.out.println(sb);
+    }
 }
