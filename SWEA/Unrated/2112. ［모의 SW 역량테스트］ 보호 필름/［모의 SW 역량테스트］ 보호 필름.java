@@ -25,7 +25,7 @@ public class Solution {
                     film[i][j] = Integer.parseInt(st.nextToken());
                 }
             }
-            
+
             dfs(0, 0);
 
             sb.append('#').append(tc).append(' ').append(minInjection).append('\n');
@@ -34,18 +34,21 @@ public class Solution {
     }
 
     static boolean isCellOk(){
-        for (int i = 0; i < W; i++) {
+        for (int c = 0; c < W; c++) {
+            int run = 1;
             boolean isOk = false;
-            for (int j = 0; j < D - (K - 1); j++) {
-                int sum = 0;
-                for (int k = 0; k < K; k++) sum += film[j + k][i];
-
-                if (sum == 0 || sum == K){
+            for (int r = 1; r < D; r++){
+                if (film[r][c] == film[r - 1][c]){
+                    run++;
+                } else {
+                    run = 1;
+                }
+                if (run >= K) {
                     isOk = true;
                     break;
                 }
             }
-            if (!isOk) return false;
+            if(!isOk) return false;
         }
         return true;
     }
@@ -58,6 +61,8 @@ public class Solution {
             }
             return;
         }
+
+        dfs(floor + 1, injectionCnt);       // 주사 X
 
         int[] temp = Arrays.copyOf(film[floor], W);
 
@@ -76,7 +81,5 @@ public class Solution {
         dfs(floor + 1, injectionCnt + 1);
 
         film[floor] = Arrays.copyOf(temp, W);
-
-        dfs(floor + 1, injectionCnt);       // 주사 X
     }
 }
