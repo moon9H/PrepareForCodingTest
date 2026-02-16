@@ -1,92 +1,89 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Solution {
-    static final int[] dr = {0, -1, 0, 1, 0};
-    static final int[] dc = {0, 0, 1, 0, -1};
-
-    public static void main(String[] args) throws Exception {
+    private static int[] dr = {0, -1, 0, 1, 0};
+    private static int[] dc = {0, 0, 1, 0, -1};
+    private static int[][] map = new int[11][11];
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder sb = new StringBuilder();
-        int T = Integer.parseInt(br.readLine().trim());
-
+        int T = Integer.parseInt(br.readLine());
         for (int tc = 1; tc <= T; tc++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
             int M = Integer.parseInt(st.nextToken());
             int A = Integer.parseInt(st.nextToken());
-
-            int[] moveA = new int[M];
-            int[] moveB = new int[M];
+            int maxPower = 0;
+            int[] aMoves = new int[M];
+            int[] bMoves = new int[M];
+            int[][] bcInform = new int [A][4];      // 0 : row, 1 : col, 2 : range, 3 : power
+            st = new StringTokenizer(br.readLine());
+            for (int i = 0; i < M; i++) {
+                aMoves[i] = Integer.parseInt(st.nextToken());
+            }
 
             st = new StringTokenizer(br.readLine());
-            for (int i = 0; i < M; i++) moveA[i] = Integer.parseInt(st.nextToken());
-
-            st = new StringTokenizer(br.readLine());
-            for (int i = 0; i < M; i++) moveB[i] = Integer.parseInt(st.nextToken());
-
-            int[] bcR = new int[A];
-            int[] bcC = new int[A];
-            int[] bcCov = new int[A];
-            int[] bcPow = new int[A];
+            for (int i = 0; i < M; i++) {
+                bMoves[i] = Integer.parseInt(st.nextToken());
+            }
 
             for (int i = 0; i < A; i++) {
                 st = new StringTokenizer(br.readLine());
-                int x = Integer.parseInt(st.nextToken());
-                int y = Integer.parseInt(st.nextToken());
-                bcC[i] = x;
-                bcR[i] = y;
-                bcCov[i] = Integer.parseInt(st.nextToken());
-                bcPow[i] = Integer.parseInt(st.nextToken());
+                bcInform[i][0] = Integer.parseInt(st.nextToken());
+                bcInform[i][1] = Integer.parseInt(st.nextToken());
+                bcInform[i][2] = Integer.parseInt(st.nextToken());
+                bcInform[i][3] = Integer.parseInt(st.nextToken());
             }
 
-            int ar = 1, ac = 1;
-            int brp = 10, bcp = 10;
+            int aCurRow = 1, aCurCol = 1;
+            int bCurRow = 10, bCurCol = 10;
+            int t = 0;
+            do {
+                int currentBest = 0;
+                for (int i = -1; i < A; i++){
+                    int aCanPower = 0;
+                    if (i != -1){
+                        int distA = Math.abs(aCurRow - bcInform[i][1])
+                                + Math.abs(aCurCol - bcInform[i][0]);
 
-            int ans = 0;
-
-            for (int t = 0; t <= M; t++) {
-                int best = 0;
-
-                for (int i = -1; i < A; i++) {
-                    int aVal = 0;
-                    if (i != -1) {
-                        int distA = Math.abs(ar - bcR[i]) + Math.abs(ac - bcC[i]);
-                        if (distA <= bcCov[i]) aVal = bcPow[i];
+                        if (distA <= bcInform[i][2]) aCanPower += bcInform[i][3];
                         else continue;
                     }
-
                     for (int j = -1; j < A; j++) {
-                        int bVal = 0;
-                        if (j != -1) {
-                            int distB = Math.abs(brp - bcR[j]) + Math.abs(bcp - bcC[j]);
-                            if (distB <= bcCov[j]) bVal = bcPow[j];
+                        int bCanPower = 0;
+                        if (j != -1){
+                            int distB = Math.abs(bCurRow - bcInform[j][1])
+                                    + Math.abs(bCurCol - bcInform[j][0]);
+
+                            if (distB <= bcInform[j][2]) bCanPower += bcInform[j][3];
                             else continue;
                         }
 
-                        int total;
-                        if (i != -1 && i == j) total = bcPow[i];
-                        else total = aVal + bVal;
+                        int totalPower = 0;
+                        if (i != -1 && i == j){
+                            totalPower = bcInform[i][3];
+                        } else {
+                            totalPower = aCanPower + bCanPower;
+                        }
 
-                        if (total > best) best = total;
+                        currentBest = Math.max(totalPower, currentBest);
                     }
                 }
 
-                ans += best;
+                maxPower += currentBest;
 
                 if (t == M) break;
+                aCurRow += dr[aMoves[t]];
+                aCurCol += dc[aMoves[t]];
+                bCurRow += dr[bMoves[t]];
+                bCurCol += dc[bMoves[t]];
 
-                int mdA = moveA[t];
-                int mdB = moveB[t];
+            } while(t++ < M);
 
-                ar += dr[mdA];
-                ac += dc[mdA];
-                brp += dr[mdB];
-                bcp += dc[mdB];
-            }
-
-            sb.append("#").append(tc).append(" ").append(ans).append("\n");
+            sb.append('#').append(tc).append(' ').append(maxPower).append('\n');
         }
-
-        System.out.print(sb.toString());
+        System.out.println(sb);
     }
 }
