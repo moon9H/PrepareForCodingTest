@@ -40,6 +40,8 @@ public class Solution {
     }
 
     static void dfs(int count, int lineSum, int coreSum){
+        if (coreSum + (needToConnectCores - count) < maxCores) return;
+
         if (count == needToConnectCores){
             if (coreSum > maxCores){
                 maxCores = coreSum;
