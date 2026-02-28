@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
-    private static int N, M, D, maxKill;
+    private static int N, M, D, maxKill, enemy;
     private static int[][] map;
     private static ArrayList<Integer> pos = new ArrayList<>();
     public static void main(String[] args) throws IOException {
@@ -18,22 +18,18 @@ public class Main {
         D = Integer.parseInt(st.nextToken());
         maxKill = Integer.MIN_VALUE;
         map = new int[N][M];
-
+        enemy = 0;
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < M; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
+                if (map[i][j] == 1) ++enemy;
             }
         }
 
         dfs(0, 0);
 
         System.out.println(maxKill);
-    }
-
-    static boolean isMapClear(int[][] grid) {
-        for (int[] ints : grid) for (int i : ints) if (i == 1) return false;
-        return true;
     }
 
     static int[] pickTarget(int[][] playBoard, int archerCol) {
@@ -74,11 +70,12 @@ public class Main {
 
     static void playCastleDefence() {
         int[][] playBoard = new int[N][M];
+        int curEnemy = enemy;
         for (int i = 0; i < N; i++) {
             playBoard[i] = Arrays.copyOf(map[i], M);
         }
         int kill = 0;
-        while (!isMapClear(playBoard)) {
+        while (curEnemy > 0) {
             // 1. 궁수 위치 기반으로 타겟 선정
             ArrayList<int[]> targets = new ArrayList<>();
             for (Integer archerPos : pos) {
@@ -91,7 +88,11 @@ public class Main {
                 if (playBoard[target[0]][target[1]] == 1) {
                     playBoard[target[0]][target[1]] = 0;
                     kill++;
+                    curEnemy--;
                 }
+            }
+            for (int i = 0; i < M; i++) {
+                curEnemy -= playBoard[N - 1][i];
             }
             // 3. 남은 적군 한 칸 진격
             for (int r = N - 2; r >= 0; r--) {
