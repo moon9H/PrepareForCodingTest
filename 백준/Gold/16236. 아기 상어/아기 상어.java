@@ -2,36 +2,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-    private static final int[] dr = {0, -1, 1, 0};
-    private static final int[] dc = {-1, 0, 0, 1};
-    private static int N;
-    private static int[][] map;
-    static class BabyShark {
-        int size;
-        int needToEat;
-        public BabyShark() {
-            this.size = this.needToEat = 2;
-        }
-
-        public void eat() {
-            if (--needToEat == 0) {
-                ++size;
-                needToEat = size;
-            }
-        }
-    }
+    private static final int[] dr = {-1, 1, 0, 0};
+    private static final int[] dc = {0, 0, -1, 1};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        map = new int[N][N];
+        int N = Integer.parseInt(br.readLine());
+        int[][] map = new int[N][N];
+
+        int sharkSize = 2, sharkNeedToEat = 2;
         int sr = -1, sc = -1;
-        BabyShark bs = new BabyShark();
 
         for (int i = 0; i < N; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
@@ -40,53 +24,73 @@ public class Main {
                 if (map[i][j] == 9) {
                     sr = i;
                     sc = j;
-                    map[i][j] = 0;
+                    map[i][j] = 0; // 시작 위치는 빈 칸으로 처리
                 }
             }
         }
 
-        int momTime = 0;
+        int time = 0;
+
         while (true) {
             boolean[][] visited = new boolean[N][N];
             Queue<int[]> queue = new ArrayDeque<>();
-            queue.add(new int[] {sr, sc, 0});
+            queue.add(new int[]{sr, sc, 0});
             visited[sr][sc] = true;
+
             int minDist = Integer.MAX_VALUE;
-            PriorityQueue<int[]> pq  = new PriorityQueue<>((o1, o2) -> {
-                if (o1[2] != o2[2]) return Integer.compare(o1[2], o2[2]);
-                if (o1[0] != o2[0]) return Integer.compare(o1[0], o2[0]);
-                return Integer.compare(o1[1], o2[1]);
-            });
+            int bestR = -1, bestC = -1;
 
             while (!queue.isEmpty()) {
-                int[] curShark = queue.poll();
+                int[] curPos = queue.poll();
+                int curR = curPos[0];
+                int curC = curPos[1];
+                int curD = curPos[2];
+
+                // 이미 최소거리 먹잇감을 찾았으면 그 이상 거리 확장은 필요 없음
+                if (curD >= minDist) continue;
+
                 for (int d = 0; d < 4; d++) {
-                    int nr = curShark[0] + dr[d];
-                    int nc = curShark[1] + dc[d];
+                    int nr = curR + dr[d];
+                    int nc = curC + dc[d];
 
-                    if (nr < 0 || nr >= N || nc < 0 || nc >= N ||
-                        visited[nr][nc] || map[nr][nc] > bs.size) continue;
+                    if (nr < 0 || nr >= N || nc < 0 || nc >= N) continue;
+                    if (visited[nr][nc]) continue;
+                    if (map[nr][nc] > sharkSize) continue; // 지나갈 수 없음
 
-                    queue.add(new int[] {nr, nc, curShark[2] + 1});
+                    int nd = curD + 1;
                     visited[nr][nc] = true;
+                    queue.add(new int[]{nr, nc, nd});
 
-                    if (map[nr][nc] != 0 && map[nr][nc] < bs.size
-                            && curShark[2] + 1 <= minDist) {
-                        minDist = Math.min(curShark[2] + 1, minDist);
-                        pq.add(new int[] {nr, nc, minDist});
+                    // 먹을 수 있는 물고기 후보
+                    if (map[nr][nc] != 0 && map[nr][nc] < sharkSize) {
+                        if (nd < minDist) {
+                            minDist = nd;
+                            bestR = nr;
+                            bestC = nc;
+                        } else if (nd == minDist) {
+                            if (nr < bestR || (nr == bestR && nc < bestC)) {
+                                bestR = nr;
+                                bestC = nc;
+                            }
+                        }
                     }
                 }
             }
 
-            if (pq.isEmpty()) break;
+            if (bestR == -1) break; // 먹을 수 있는 물고기 없음
 
-            momTime += minDist;
-            sr = pq.peek()[0];
-            sc = pq.peek()[1];
+            // 이동 + 먹기
+            time += minDist;
+            sr = bestR;
+            sc = bestC;
             map[sr][sc] = 0;
-            bs.eat();
+
+            if (--sharkNeedToEat == 0) {
+                sharkSize++;
+                sharkNeedToEat = sharkSize;
+            }
         }
 
-        System.out.println(momTime);
+        System.out.println(time);
     }
 }
