@@ -49,10 +49,9 @@ public class Solution {
 			if (okToConnect(sideCore.get(count), d)) {
 				dfs(count + 1, numCore + 1, lineSum + connectLine(sideCore.get(count), d, 1));
 				connectLine(sideCore.get(count), d, 0);
-			} else {
-				dfs(count + 1, numCore, lineSum);
 			}
 		}
+		dfs(count + 1, numCore, lineSum);
 	}
 	
 	static int connectLine(int[] curPos, int dir, int mode) {
