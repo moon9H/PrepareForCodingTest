@@ -11,34 +11,34 @@ public class Main {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		int N = Integer.parseInt(st.nextToken());
-		ArrayList<Integer>[] adjList = new ArrayList[N + 1];
-		for (int i = 1; i <= N; i++) {
-			adjList[i] = new ArrayList<>();
-		}
-		int[] inDegree = new int[N + 1];
 		int M = Integer.parseInt(st.nextToken());
+		int[] inDegrees = new int[N + 1];
+		ArrayList<Integer>[] graph = new ArrayList[N + 1];
+		for (int i = 0; i <= N; i++) {
+			graph[i] = new ArrayList<>();
+		}
+		
 		for (int i = 0; i < M; i++) {
 			st = new StringTokenizer(br.readLine());
-			int A = Integer.parseInt(st.nextToken());
-			int B = Integer.parseInt(st.nextToken());
-			adjList[A].add(B);
-			++inDegree[B];
+			int from = Integer.parseInt(st.nextToken());
+			int to = Integer.parseInt(st.nextToken());
+			graph[from].add(to);
+			++inDegrees[to];
 		}
 		
 		Queue<Integer> queue = new ArrayDeque<>();
-		for (int i = 1; i < N + 1; i++) {
-			if (inDegree[i] == 0) queue.add(i);
+		for (int i = 1; i <= N; i++) {
+			if (inDegrees[i] == 0) queue.add(i);
 		}
 		
 		StringBuilder sb = new StringBuilder();
 		while(!queue.isEmpty()) {
-			int curPos = queue.poll();
-			sb.append(curPos).append(' ');
-			for (int next : adjList[curPos]) {
-				if (--inDegree[next] == 0) queue.add(next);
+			int curNode = queue.poll();
+			sb.append(curNode).append(' ');
+			for (Integer node : graph[curNode]) {
+				if (--inDegrees[node] == 0) queue.add(node);
 			}
 		}
-		sb.append('\n');
 		System.out.println(sb);
 	}
 }
