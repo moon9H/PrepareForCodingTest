@@ -23,11 +23,11 @@ public class Solution {
 				int b = Integer.parseInt(st.nextToken());
 				union(a, b);				
 			}
-			Set<Integer> set = new HashSet<>();
-			for (int i = 1; i <= N; i++) {
-				set.add(findSet(i));
-			}
-			sb.append('#').append(tc).append(' ').append(set.size()).append('\n');
+			int ans = 0;
+            for (int i = 1; i <= N; i++) {
+                if (parents[i] == i) ++ans;
+            }
+			sb.append('#').append(tc).append(' ').append(ans).append('\n');
 		}
 		System.out.println(sb);
 	}
