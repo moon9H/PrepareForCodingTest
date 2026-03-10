@@ -1,52 +1,48 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
-	private static int ans;
-	private static ArrayList<Integer>[] graph;
-	private static boolean[] visited;
-	public static void main(String[] args) throws IOException{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		int N = Integer.parseInt(st.nextToken());
-		int M = Integer.parseInt(st.nextToken());
-		graph = new ArrayList[N];
-		for (int i = 0; i < N; i++) {
-			graph[i] = new ArrayList<>();
-		}
-		
-		for (int i = 0; i < M; i++) {
-			st = new StringTokenizer(br.readLine());
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			graph[a].add(b);
-			graph[b].add(a);
-		}
-		
-		ans = 0;
-		for (int i = 0; i < N - 1; i++) {
-			visited = new boolean[N];
-			dfs(i, 1);
-			if (ans == 1) break;
-		}
-		System.out.println(ans);
-	}
-	
-	static void dfs(int startNode, int length) {
-		if (length == 5) {
-			ans = 1;
-			return;
-		}
-		visited[startNode] = true;
-		for (Integer i : graph[startNode]) {
-			if (!visited[i]) {
-				dfs(i, length + 1);
-				if (ans == 1) return;
-			}
-		}
-		visited[startNode] = false;
-	}
+    static int res = 0;
+    static List<Integer>[] edges;
+    static int[] visited;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        int N = Integer.parseInt(st.nextToken());   // 사람의 수
+        int M = Integer.parseInt(st.nextToken());   // 친구 관계의 수
+
+        edges = new ArrayList[N];
+        for(int i = 0;i<N;i++) edges[i] = new ArrayList<>();
+        visited = new int[N];
+
+        for(int i = 0;i<M;i++) {
+            st = new StringTokenizer(br.readLine());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            edges[a].add(b);
+            edges[b].add(a);
+        }
+
+        for(int i = 0;i<N && res == 0;i++) {
+            dfs(i, 0);
+        }
+
+        System.out.println(res);
+    }
+
+    static void dfs (int start, int depth) {
+        if(depth >= 5) {
+            res = 1;
+            return;
+        }
+
+        for(int edge : edges[start]) {
+            if(visited[edge] == 0 && res == 0) {
+                visited[edge] = 1;
+                dfs(edge, depth+1);
+                visited[edge] = 0;
+            }
+        }
+    }
 }
