@@ -29,34 +29,40 @@ public class Solution {
 				customerPos[i][1] = Integer.parseInt(st.nextToken());
 			}
 			
-			dfs(0);
+			dfs(0, 0);
 			sb.append('#').append(tc).append(' ').append(minDist).append('\n');
 		}
 		System.out.println(sb);
 	}
 	
-	static void dfs(int count) {
+	static void dfs(int count, int length) {
+		if (length >= minDist) return;
+		
 		if (count == N) {
-			int dist = Math.abs(customerPos[ans.get(0)][0] - homeRow) 
-					+ Math.abs(customerPos[ans.get(0)][1] - homeCol)
-					+ Math.abs(customerPos[ans.get(N - 1)][0] - companyRow)
-					+ Math.abs(customerPos[ans.get(N - 1)][1] - companyCol);
-			for (int i = 0; i < N - 1; i++) {
-				dist += Math.abs(customerPos[ans.get(i)][0] - customerPos[ans.get(i + 1)][0])
-						+ Math.abs(customerPos[ans.get(i)][1] - customerPos[ans.get(i + 1)][1]);
-			}
-			
-			minDist = Math.min(dist, minDist);
+			int last = ans.get(ans.size() - 1);
+			length += Math.abs(customerPos[last][0] - homeRow)
+					+ Math.abs(customerPos[last][1] - homeCol);
+			minDist = Math.min(minDist, length);
 			return;
 		}
 		
 		for (int i = 0; i < N; i++) {
 			if (selected[i]) continue;
+			
 			selected[i] = true;
 			ans.add(i);
-			dfs(count + 1);
-			selected[i] = false;
+			
+			if (count == 0) {
+				dfs(count + 1, length + Math.abs(companyRow - customerPos[i][0])
+						+ Math.abs(companyCol - customerPos[i][1]));
+			} else {
+				int prev = ans.get(ans.size() - 2);
+				dfs(count + 1, length + Math.abs(customerPos[prev][0] - customerPos[i][0])
+						+ Math.abs(customerPos[prev][1] - customerPos[i][1]));
+			}
+			
 			ans.remove(ans.size() - 1);
+			selected[i] = false;
 		}
 	}
 }
