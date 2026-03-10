@@ -1,67 +1,62 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class Solution {
-    private static boolean[] isVisited;
-    private static int[] result, homePos, companyPos;
-    private static int[][] customerPos;
-    private static int customerCnt, shortestPath;
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
-        int T = Integer.parseInt(br.readLine());
-
-        for (int tc =  1; tc <= T; tc++){
-            // 입력 처리
-            customerCnt = Integer.parseInt(br.readLine());
-            companyPos = new int[2];                          // 회사 위치
-            homePos = new int[2];                             // 집 위치
-            customerPos = new int[customerCnt][2];          // 들려야하는 고객들 위치
-            isVisited = new boolean[customerCnt];
-            result = new int[customerCnt];
-            shortestPath = Integer.MAX_VALUE;
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            companyPos[0] = Integer.parseInt(st.nextToken());
-            companyPos[1] = Integer.parseInt(st.nextToken());
-            homePos[0] = Integer.parseInt(st.nextToken());
-            homePos[1] = Integer.parseInt(st.nextToken());
-
-            for (int customer = 0; customer < customerCnt; customer++){
-                customerPos[customer][0] = Integer.parseInt(st.nextToken());
-                customerPos[customer][1] = Integer.parseInt(st.nextToken());
-            }
-            dfs(0);
-            sb.append('#').append(tc).append(' ').append(shortestPath).append('\n');
-        }
-        System.out.println(sb);
-    }
-
-    public static void dfs(int cnt){
-        if (cnt == customerCnt){
-
-            int pathLength = Math.abs(customerPos[result[0]][0] - companyPos[0]) +
-                             Math.abs(customerPos[result[0]][1] - companyPos[1]);
-            for (int i = 1; i < customerCnt; i++){
-                pathLength += Math.abs(customerPos[result[i]][0] - customerPos[result[i - 1]][0]) +
-                        Math.abs(customerPos[result[i]][1] - customerPos[result[i - 1]][1]);
-            }
-            pathLength += Math.abs(customerPos[result[customerCnt - 1]][0] - homePos[0]) +
-                    Math.abs(customerPos[result[customerCnt - 1]][1] - homePos[1]);
-
-            shortestPath = Math.min(shortestPath, pathLength);
-            return;
-        }
-
-        for (int i = 0; i < customerCnt; i++){
-            if (isVisited[i]) continue;
-
-            isVisited[i] = true;
-            result[cnt] = i;
-            dfs(cnt + 1);
-            isVisited[i] = false;
-        }
-    }
+	private static int N, homeRow, homeCol, companyRow, companyCol, minDist;
+	private static boolean[] selected;
+	private static ArrayList<Integer> ans;
+	private static int[][] customerPos;
+	public static void main(String[] args) throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
+		int T = Integer.parseInt(br.readLine());
+		for (int tc = 1; tc <= T; tc++) {
+			N = Integer.parseInt(br.readLine());
+			customerPos = new int[N][2];
+			selected = new boolean[N];
+			minDist = Integer.MAX_VALUE;
+			ans = new ArrayList<>();
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			companyRow = Integer.parseInt(st.nextToken());
+			companyCol = Integer.parseInt(st.nextToken());
+			homeRow = Integer.parseInt(st.nextToken());
+			homeCol = Integer.parseInt(st.nextToken());
+			for (int i = 0; i < N; i++) {
+				customerPos[i][0] = Integer.parseInt(st.nextToken());
+				customerPos[i][1] = Integer.parseInt(st.nextToken());
+			}
+			
+			dfs(0);
+			sb.append('#').append(tc).append(' ').append(minDist).append('\n');
+		}
+		System.out.println(sb);
+	}
+	
+	static void dfs(int count) {
+		if (count == N) {
+			int dist = Math.abs(customerPos[ans.get(0)][0] - homeRow) 
+					+ Math.abs(customerPos[ans.get(0)][1] - homeCol)
+					+ Math.abs(customerPos[ans.get(N - 1)][0] - companyRow)
+					+ Math.abs(customerPos[ans.get(N - 1)][1] - companyCol);
+			for (int i = 0; i < N - 1; i++) {
+				dist += Math.abs(customerPos[ans.get(i)][0] - customerPos[ans.get(i + 1)][0])
+						+ Math.abs(customerPos[ans.get(i)][1] - customerPos[ans.get(i + 1)][1]);
+			}
+			
+			minDist = Math.min(dist, minDist);
+			return;
+		}
+		
+		for (int i = 0; i < N; i++) {
+			if (selected[i]) continue;
+			selected[i] = true;
+			ans.add(i);
+			dfs(count + 1);
+			selected[i] = false;
+			ans.remove(ans.size() - 1);
+		}
+	}
 }
