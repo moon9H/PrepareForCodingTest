@@ -1,115 +1,111 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class Solution {
-
-    static final int[] dr = {0, -1, 1, 0, 0};
-    static final int[] dc = {0, 0, 0, -1, 1};
-
-    static int reverseDir(int d) {
-        if (d == 1) return 2;
-        if (d == 2) return 1;
-        if (d == 3) return 4;
-        return 3;
-    }
-
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
-
-        int T = Integer.parseInt(br.readLine().trim());
-
-        for (int tc = 1; tc <= T; tc++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int N = Integer.parseInt(st.nextToken());
-            int M = Integer.parseInt(st.nextToken());
-            int K = Integer.parseInt(st.nextToken());
-
-            int[] r = new int[K];
-            int[] c = new int[K];
-            int[] cnt = new int[K];
-            int[] dir = new int[K];
-
-            for (int i = 0; i < K; i++) {
-                st = new StringTokenizer(br.readLine());
-                r[i] = Integer.parseInt(st.nextToken());
-                c[i] = Integer.parseInt(st.nextToken());
-                cnt[i] = Integer.parseInt(st.nextToken());
-                dir[i] = Integer.parseInt(st.nextToken());
-            }
-
-            int size = N * N;
-            int[] sum = new int[size];
-            int[] max = new int[size];
-            int[] dirPick = new int[size];
-            boolean[] touched = new boolean[size];
-            int[] touchedKeys = new int[size];
-
-            for (int t = 0; t < M; t++) {
-                int touchedCnt = 0;
-
-                for (int i = 0; i < K; i++) {
-                    if (cnt[i] == 0) continue;
-
-                    int nr = r[i] + dr[dir[i]];
-                    int nc = c[i] + dc[dir[i]];
-                    int ncnt = cnt[i];
-                    int ndir = dir[i];
-
-                    if (nr == 0 || nc == 0 || nr == N - 1 || nc == N - 1) {
-                        ncnt /= 2;
-                        ndir = reverseDir(ndir);
-                        if (ncnt == 0) {
-                            cnt[i] = 0;
-                            continue;
-                        }
-                    }
-
-                    int key = nr * N + nc;
-
-                    if (!touched[key]) {
-                        touched[key] = true;
-                        touchedKeys[touchedCnt++] = key;
-                        sum[key] = 0;
-                        max[key] = 0;
-                        dirPick[key] = 0;
-                    }
-
-                    sum[key] += ncnt;
-                    if (ncnt > max[key]) {
-                        max[key] = ncnt;
-                        dirPick[key] = ndir;
-                    }
-                }
-
-                int newK = 0;
-
-                for (int idx = 0; idx < touchedCnt; idx++) {
-                    int key = touchedKeys[idx];
-                    int total = sum[key];
-                    if (total > 0) {
-                        r[newK] = key / N;
-                        c[newK] = key % N;
-                        cnt[newK] = total;
-                        dir[newK] = dirPick[key];
-                        newK++;
-                    }
-                    touched[key] = false;
-                    sum[key] = 0;
-                    max[key] = 0;
-                    dirPick[key] = 0;
-                }
-
-                for (int i = newK; i < K; i++) cnt[i] = 0;
-                K = newK;
-            }
-
-            int ans = 0;
-            for (int i = 0; i < K; i++) ans += cnt[i];
-
-            sb.append("#").append(tc).append(" ").append(ans).append("\n");
-        }
-
-        System.out.print(sb.toString());
-    }
+	private static int N, M, K;
+	private static final int[] dr = {-1, 1, 0, 0};
+	private static final int[] dc = {0, 0, -1, 1};
+	static class cluster{
+		int row, col, num, dir;
+		boolean alive;
+		public cluster(int row, int col, int num, int dir) {
+			super();
+			this.row = row;
+			this.col = col;
+			this.num = num;
+			this.dir = dir;
+			this.alive = true;
+		}		
+	}
+	public static void main(String[] args) throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
+		int T = Integer.parseInt(br.readLine());
+		for (int tc = 1; tc <= T; tc++) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			N = Integer.parseInt(st.nextToken());
+			M = Integer.parseInt(st.nextToken());
+			K = Integer.parseInt(st.nextToken());
+			ArrayList<cluster> cList = new ArrayList<>();
+			for (int i = 0; i < K; i++) {
+				st = new StringTokenizer(br.readLine());
+				cList.add(new cluster(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), 
+						Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()) - 1));
+			}
+			
+			while(M > 0) {	
+				// 1. 미생물 위치 업데이트
+				for (cluster c : cList) {
+					if (!c.alive) continue;
+					int nr = c.row + dr[c.dir];
+					int nc = c.col + dc[c.dir];
+					if (nr == 0 || nr == N - 1 || nc == 0 || nc == N - 1) {
+						c.num /= 2;
+						if (c.num == 0) {
+							c.alive = false;
+							continue;
+						}
+						switch(c.dir) {
+						case 0 :
+							c.dir = 1;
+							break;
+						case 1 :
+							c.dir = 0;
+							break;
+						case 2 :
+							c.dir = 3;
+							break;
+						case 3 :
+							c.dir = 2;
+							break;
+						}
+					}
+					
+					c.row = nr;
+					c.col = nc;
+				}
+				
+				// 2. 미생물 충돌 처리
+				for (int i = 0; i < cList.size() - 1; i++) {
+					cluster standard = cList.get(i);
+					if (!standard.alive) continue;
+					
+					int sum = standard.num;
+					int maxNum = standard.num;
+					int dir = standard.dir;
+					boolean collision = false;
+					
+					for (int j = i + 1; j < cList.size(); j++) {
+						cluster target = cList.get(j);
+						if (!target.alive) continue;
+						
+						if (standard.row == target.row && standard.col == target.col) {
+							collision = true;
+							sum += target.num;
+							if (target.num > maxNum) {
+								maxNum = target.num;
+								dir = target.dir;
+							}
+							target.alive = false;
+						}
+					}
+					
+					if (collision) {
+						standard.num = sum;
+						standard.dir = dir;
+					}
+				}
+				--M;
+			}
+			int ans = 0;
+			for (cluster c : cList) {
+				if (c.alive) ans += c.num;
+			}
+			sb.append('#').append(tc).append(' ').append(ans).append('\n');
+		}
+		System.out.println(sb);
+	}
 }
