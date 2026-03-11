@@ -33,7 +33,7 @@ public class Solution {
 			PriorityQueue<int[]> pq = new PriorityQueue<>((o1, o2) -> {
 				return Integer.compare(o1[1], o2[1]);
 			});
-			pq.add(new int[] {1, 0});
+			pq.add(new int[] {V, 0});
 			long result = 0;
 			int count = 0;
 			
