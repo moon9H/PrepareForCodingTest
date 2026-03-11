@@ -32,8 +32,7 @@ public class Main {
 			
 			if (curPos[0] == N - 1 && curPos[1] == M - 1) {
 				minDist = Math.min(minDist, curPos[2]);
-				queue.clear();
-                continue;
+				break;
 			}
 			
 			for (int d = 0; d < 4; d++) {
