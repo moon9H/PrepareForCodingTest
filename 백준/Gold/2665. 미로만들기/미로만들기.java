@@ -36,7 +36,7 @@ public class Main {
                 int nextC = now.c + dc[i];
                 if(nextR >= 0 && nextC >= 0 && nextR < size && nextC < size) {
                     // 진행방향의 기존 weight보다 현재 연산하는 weight가 더 작을경우 queue에 추가한다.
-                    int nextCost = dist[now.r][now.c];
+                    int nextCost = now.weight;
                     if(board[nextR][nextC] == 0) {
                         nextCost += 1;    
                     }
