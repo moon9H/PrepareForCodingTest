@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,27 +19,18 @@ public class Solution {
 			int rotateCnt = N / 4;
 			String nums = br.readLine();
 						
-			Set<String> set = new HashSet<>();				// 중복 관리할 자료 구조
+			Set<Integer> set = new HashSet<>();				// 중복 관리할 자료 구조
 			for (int i = 0; i < rotateCnt; i++) {
-				int len = N / 4;
-				set.add(nums.substring(0, len));
-				set.add(nums.substring(len, 2 * len));
-				set.add(nums.substring(2 * len, 3 * len));
-				set.add(nums.substring(3 * len));
+				for (int j = 0; j < 4; j++) {
+					int start = j * rotateCnt;
+					int end = start + rotateCnt;
+					set.add(Integer.parseInt(nums.substring(start, end), 16));
+				}
 				
 				nums = nums.charAt(N - 1) + nums.substring(0, N - 1);
 			}
 			
-			ArrayList<String> ans = new ArrayList<>();
-			for (String string : set) {
-				ans.add(string);
-			}
-			
-			Integer[] converAns = new Integer[set.size()];
-			
-			for (int i = 0; i < set.size(); i++) {
-				converAns[i] = Integer.valueOf(ans.get(i), 16);
-			}
+			Integer[] converAns = set.toArray(new Integer[0]);
 			
 			Arrays.sort(converAns, (o1, o2) -> o2 - o1);
 			
