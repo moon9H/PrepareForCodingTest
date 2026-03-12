@@ -27,6 +27,9 @@ public class Main {
 		
 		while (!pq.isEmpty()) {
 			int[] curPos = pq.poll();
+            
+            if (curPos[1] > dist[curPos[0]]) continue;
+            
 			if (curPos[0] == K) {
 				System.out.println(curPos[1]);
 				return;
