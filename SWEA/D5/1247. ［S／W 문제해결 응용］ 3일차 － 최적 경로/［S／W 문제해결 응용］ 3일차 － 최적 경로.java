@@ -1,68 +1,64 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.io.*;
 
 public class Solution {
-	private static int N, homeRow, homeCol, companyRow, companyCol, minDist;
-	private static boolean[] selected;
-	private static ArrayList<Integer> ans;
-	private static int[][] customerPos;
-	public static void main(String[] args) throws IOException{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringBuilder sb = new StringBuilder();
-		int T = Integer.parseInt(br.readLine());
-		for (int tc = 1; tc <= T; tc++) {
-			N = Integer.parseInt(br.readLine());
-			customerPos = new int[N][2];
-			selected = new boolean[N];
-			minDist = Integer.MAX_VALUE;
-			ans = new ArrayList<>();
-			StringTokenizer st = new StringTokenizer(br.readLine());
-			companyRow = Integer.parseInt(st.nextToken());
-			companyCol = Integer.parseInt(st.nextToken());
-			homeRow = Integer.parseInt(st.nextToken());
-			homeCol = Integer.parseInt(st.nextToken());
-			for (int i = 0; i < N; i++) {
-				customerPos[i][0] = Integer.parseInt(st.nextToken());
-				customerPos[i][1] = Integer.parseInt(st.nextToken());
-			}
-			
-			dfs(0, 0);
-			sb.append('#').append(tc).append(' ').append(minDist).append('\n');
-		}
-		System.out.println(sb);
-	}
-	
-	static void dfs(int count, int length) {
-		if (length >= minDist) return;
-		
-		if (count == N) {
-			int last = ans.get(ans.size() - 1);
-			length += Math.abs(customerPos[last][0] - homeRow)
-					+ Math.abs(customerPos[last][1] - homeCol);
-			minDist = Math.min(minDist, length);
-			return;
-		}
-		
-		for (int i = 0; i < N; i++) {
-			if (selected[i]) continue;
-			
-			selected[i] = true;
-			ans.add(i);
-			
-			if (count == 0) {
-				dfs(count + 1, length + Math.abs(companyRow - customerPos[i][0])
-						+ Math.abs(companyCol - customerPos[i][1]));
-			} else {
-				int prev = ans.get(ans.size() - 2);
-				dfs(count + 1, length + Math.abs(customerPos[prev][0] - customerPos[i][0])
-						+ Math.abs(customerPos[prev][1] - customerPos[i][1]));
-			}
-			
-			ans.remove(ans.size() - 1);
-			selected[i] = false;
-		}
-	}
+    static int[] visited;
+    static int N;
+    static pos[] customers;
+    static pos home;
+    static int min;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int tc = Integer.parseInt(br.readLine());
+
+        for(int t = 1;t<=tc;t++) {
+            N = Integer.parseInt(br.readLine());    // 고객의 수 N
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int homeR = Integer.parseInt(st.nextToken());
+            int homeC = Integer.parseInt(st.nextToken());
+            home = new pos(homeR, homeC);   // 집의 좌표
+            int coR = Integer.parseInt(st.nextToken());
+            int coC = Integer.parseInt(st.nextToken());
+            pos co = new pos(coR, coC);     // 회사의 좌표
+            customers = new pos[N+1];   // 고객 좌표 배열
+            customers[N] = co;
+            for(int i = 0;i<N;i++) {
+                int cusR = Integer.parseInt(st.nextToken());
+                int cusC = Integer.parseInt(st.nextToken());
+                customers[i] = new pos(cusR, cusC);
+            }
+            visited = new int[N+1];
+            min = Integer.MAX_VALUE;
+
+            dfs(0, N, 0);
+            System.out.printf("#%d %d%n", t, min);
+        }
+    }
+
+    static void dfs (int depth, int last, int totalDist) {
+        if(depth == N) {
+            // 모든 고객을 방문한경우 last에서 home까지의 거리를 더한뒤 최소값 계산
+            // 계산 종료후 return
+            int dist = Math.abs(customers[last].r - home.r) + Math.abs(customers[last].c - home.c);
+            min = Math.min(min, totalDist + dist);
+        }
+
+        // visited 배열을 통해 모든 고객 방문하기
+        for(int i = 0;i<N;i++) {
+            if(visited[i] == 1) continue;
+            int dist = Math.abs(customers[last].r - customers[i].r) + Math.abs(customers[last].c - customers[i].c);
+            visited[i] = 1;
+            dfs(depth + 1, i, totalDist + dist);
+            visited[i] = 0;
+        }
+    }
+
+    static class pos {
+        int r;
+        int c;
+        pos(int r, int c) {
+            this.r = r;
+            this.c = c;
+        }
+    }
 }
