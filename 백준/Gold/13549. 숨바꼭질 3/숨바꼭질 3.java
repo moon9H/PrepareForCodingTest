@@ -17,6 +17,7 @@ public class Main {
 
         while(!pq.isEmpty()) {
             pos now = pq.poll();
+            if(now.idx == K) break;
             if(dist[now.idx] != now.dist) continue;
 
             // x+1로 걷기
