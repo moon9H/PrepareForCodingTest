@@ -7,7 +7,7 @@ import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Solution {
-	private static int N, H, W, minLeftBricks;
+	private static int N, H, W, minLeftBricks, originBricks;
 	private static int[][] map;
 	private static int[] order;
 	private static final int[] dr = {-1, 1, 0, 0};
@@ -24,7 +24,8 @@ public class Solution {
 			N = Integer.parseInt(st.nextToken());
 			W = Integer.parseInt(st.nextToken());
 			H = Integer.parseInt(st.nextToken());
-
+			originBricks = 0;
+			
 			map = new int[H][W];
 			order = new int[N];
 			minLeftBricks = Integer.MAX_VALUE;
@@ -33,6 +34,7 @@ public class Solution {
 				st = new StringTokenizer(br.readLine());
 				for (int j = 0; j < W; j++) {
 					map[i][j] = Integer.parseInt(st.nextToken());
+					if (map[i][j] != 0) ++originBricks;
 				}
 			}
 
@@ -46,6 +48,7 @@ public class Solution {
 
 	static int dropBomb() {
 		int[][] copyMap = new int[H][W];
+		int remain = originBricks;
 		for (int i = 0; i < H; i++) {
 			copyMap[i] = Arrays.copyOf(map[i], W);
 		}
@@ -58,12 +61,12 @@ public class Solution {
 				row++;
 			}
 
-			if (row == H) continue;
+			if (row == H) continue;								// 해당 열에 벽돌이 없으므로 skip
 
 			Queue<int[]> queue = new ArrayDeque<>();
 			queue.add(new int[] {row, col, copyMap[row][col]});
 			copyMap[row][col] = 0;
-
+			--remain;
 			while (!queue.isEmpty()) {
 				int[] curBrick = queue.poll();
 				int r = curBrick[0];
@@ -79,11 +82,13 @@ public class Solution {
 						if (copyMap[nr][nc] == 0) continue;
 
 						queue.add(new int[] {nr, nc, copyMap[nr][nc]});
-						copyMap[nr][nc] = 0;
+						copyMap[nr][nc] = 0;						// 블록 삭제
+						--remain;
 					}
 				}
 			}
-
+			
+			// 중력을 적용해서 아래로 내리기
 			for (int j = 0; j < W; j++) {
 				int[] temp = new int[H];
 				int idx = H - 1;
@@ -97,13 +102,6 @@ public class Solution {
 				for (int k = 0; k < H; k++) {
 					copyMap[k][j] = temp[k];
 				}
-			}
-		}
-
-		int remain = 0;
-		for (int i = 0; i < H; i++) {
-			for (int j = 0; j < W; j++) {
-				if (copyMap[i][j] != 0) ++remain;
 			}
 		}
 
