@@ -16,10 +16,10 @@ public class Solution {
 			int N = Integer.parseInt(br.readLine());
 			int[][] map = new int[N][N];
 			int[][] dist = new int[N][N];
-			for (int[] is : dist) {
-				Arrays.fill(is, Integer.MAX_VALUE);
+			boolean[][] visited = new boolean[N][N];
+			for (int i = 0; i < N; i++) {
+				Arrays.fill(dist[i], Integer.MAX_VALUE);
 			}
-			
 			for (int i = 0; i < N; i++) {
 				String line = br.readLine();
 				for (int j = 0; j < N; j++) {
@@ -27,21 +27,27 @@ public class Solution {
 				}
 			}
 			
-			dist[0][0] = map[0][0];
 			PriorityQueue<int[]> pq = new PriorityQueue<>((o1, o2) -> {
 				return Integer.compare(o1[2], o2[2]);
 			});
 			
-			pq.add(new int[] {0, 0, dist[0][0]});
+			dist[0][0] = map[0][0];
+			pq.add(new int[] {0, 0, map[0][0]});
 			
 			while(!pq.isEmpty()) {
 				int[] curPos = pq.poll();
-				if (curPos[2] > dist[curPos[0]][curPos[1]]) continue;
+				
+				if (visited[curPos[0]][curPos[1]]) continue;
+				
+				visited[curPos[0]][curPos[1]] = true;
+				
+				if (curPos[0] == N - 1 && curPos[1] == N - 1) break;
+				
 				for (int d = 0; d < 4; d++) {
 					int nr = curPos[0] + dr[d];
 					int nc = curPos[1] + dc[d];
 					
-					if (nr < 0 || nr >= N || nc < 0 || nc >= N) continue;
+					if (nr < 0 || nr >= N || nc < 0 || nc >= N || visited[nr][nc]) continue;
 					
 					int newCost = curPos[2] + map[nr][nc];
 					
@@ -54,6 +60,7 @@ public class Solution {
 			
 			sb.append('#').append(tc).append(' ').append(dist[N - 1][N - 1]).append('\n');
 		}
+		
 		System.out.println(sb);
 	}
 }
