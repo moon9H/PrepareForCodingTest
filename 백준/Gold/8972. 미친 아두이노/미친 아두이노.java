@@ -27,9 +27,8 @@ public class Main {
 		}
 		
         String move = br.readLine();
-		// int[] move = Arrays.stream(br.readLine().split("")).mapToInt(Integer::parseInt).toArray();
-		
 		int kraj = 0;
+
 		for(int m = 0;m<move.length();m++) {
             // 종수 아두이노 이동
             int dir = move.charAt(m) - '0';
@@ -38,39 +37,33 @@ public class Main {
 			kraj++;
 
 			for(pos p : A) {    // 종수 아두이노 이동후 충돌 판정
-                if(p.d) continue;
 				if(J.r == p.r && J.c == p.c) {
                     System.out.printf("kraj %d", kraj);
 					return;
 				}
 			}
 
+            int[][] isCrash = new int[R][C];    // 특정 위치에 몇개의 미친 아두이노가 있는지 카운트
+
 			for(pos p : A) {    // 미친 아두이노 이동
-                if(p.d) continue;
                 p.r -= Integer.compare(p.r - J.r, 0);
                 p.c -= Integer.compare(p.c - J.c, 0);
 
-                if(p.r == J.r && p.c == J.c) {  // 각 아두이노 이동후 개별적으로 충돌 판정
+                // 각 아두이노 이동후 개별적으로 충돌 판정
+                if(p.r == J.r && p.c == J.c) {
                     System.out.printf("kraj %d", kraj);
                     return;
                 }
+
+                isCrash[p.r][p.c]++;
 			}
 
-            int[][] isCrash = new int[R][C];    // 특정 위치에 몇개의 미친 아두이노가 있는지 카운트
+            List<pos> newList = new ArrayList<>();
             for(pos p : A) {
-                if(p.d) continue;
-                isCrash[p.r][p.c]++;
+                if(isCrash[p.r][p.c] == 1) newList.add(p);
             }
 
-            for(int i = 0;i<R;i++) {    // 카운트 배열을 순회하며 2이상인 칸의 아두이노 제거
-                for(int j = 0;j<C;j++) {
-                    if(isCrash[i][j] > 1) {
-                        for(pos p : A) {
-                            if(p.r == i && p.c == j) p.d = true;
-                        }
-                    }
-                }
-            }
+            A = newList;
 		}
 
         char[][] answer = new char[R][C];
@@ -79,21 +72,21 @@ public class Main {
         }
         answer[J.r][J.c] = 'I';
         for(pos p : A) {
-            if(p.d) continue;
             answer[p.r][p.c] = 'R';
         }
+        StringBuilder sb = new StringBuilder();
         for(int i = 0;i<R;i++) {
             for(int j = 0;j<C;j++) {
-                System.out.printf("%c", answer[i][j]);
+                sb.append(answer[i][j]);
             }
-            System.out.println();
+            sb.append('\n');
         }
+        System.out.println(sb);
 	}
 
 	static class pos {
 		int r;
 		int c;
-        boolean d = false;
 		pos(int r, int c){
 			this.r = r;
 			this.c = c;
