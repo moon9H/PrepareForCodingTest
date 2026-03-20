@@ -27,7 +27,7 @@ public class Main {
 			int nr = cRow + dr[d];
 			int nc = cCol + dc[d];
 			
-			if (nr < 0 || nc >= N || nc < 0 || nc >= N) {
+			if (nr < 0 || nr >= N || nc < 0 || nc >= N) {
 				d = (d + 2) % 4;
 				continue;
 			}
