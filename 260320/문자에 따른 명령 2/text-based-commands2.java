@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Main {
-	private static int[] dr = {-1, 0, 1, 0};
+	private static int[] dr = {1, 0, -1, 0};
 	private static int[] dc = {0, 1, 0, -1};
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
