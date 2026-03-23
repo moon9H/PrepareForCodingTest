@@ -45,7 +45,8 @@ public class Main {
 			}
 		}
 		for (int i = 2; i <= N; i++) {
-			System.out.println(dist[i]);
+			if (dist[i] == Integer.MAX_VALUE) System.out.println(-1);
+			else System.out.println(dist[i]);
 		}
 	}
 }
