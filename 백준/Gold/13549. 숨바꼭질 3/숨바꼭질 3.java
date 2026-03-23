@@ -1,62 +1,50 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.StringTokenizer;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken());   // 수빈이의 위치
-        int K = Integer.parseInt(st.nextToken());   // 동생의 위치
 
-        int[] dist = new int[100001];
+        int N = Integer.parseInt(st.nextToken());
+        int K = Integer.parseInt(st.nextToken());
+        int fastTime = 0;
+        int[] dist = new int[100_001];
+        Deque<Integer> dq = new ArrayDeque<>();
         Arrays.fill(dist, Integer.MAX_VALUE);
 
-        PriorityQueue<pos> pq = new PriorityQueue<>((a, b) -> a.dist - b.dist);
-        pq.add(new pos(N, 0));
         dist[N] = 0;
+        dq.addFirst(N);
 
-        while(!pq.isEmpty()) {
-            pos now = pq.poll();
-            if(now.idx == K) break;
-            if(dist[now.idx] != now.dist) continue;
-
-            // x+1로 걷기
-            int nextIdx = now.idx + 1;
-            if(nextIdx <= K) {
-                if(dist[nextIdx] > dist[now.idx] + 1) {
-                    dist[nextIdx] = dist[now.idx] + 1;
-                    pq.add(new pos(nextIdx, dist[now.idx] + 1));
-                }
+        while(!dq.isEmpty()){
+            int curPos = dq.poll();
+            if (curPos == K){
+                fastTime = dist[curPos];
+                dq.clear();
+                continue;
             }
 
-            // x-1로 걷기
-            int prevIdx = now.idx - 1;
-            if(prevIdx >= 0) {
-                if(dist[prevIdx] > dist[now.idx] + 1) {
-                    dist[prevIdx] = dist[now.idx] + 1;
-                    pq.add(new pos(prevIdx, dist[now.idx] + 1));
-                }
+            if (curPos + 1 < 100_001 && dist[curPos + 1] > dist[curPos] + 1){
+                dist[curPos + 1] = dist[curPos] + 1;
+                dq.add(curPos + 1);
             }
 
-            // 2*x로 순간이동
-            int warpIdx = now.idx * 2;
-            if(warpIdx <= 100000) {
-                if(dist[warpIdx] > dist[now.idx]) {
-                    dist[warpIdx] = dist[now.idx];
-                    pq.add(new pos(warpIdx, dist[now.idx]));
-                }
+            if (curPos - 1 >= 0 && dist[curPos - 1] > dist[curPos] + 1) {
+                dist[curPos - 1] = dist[curPos] + 1;
+                dq.add(curPos - 1);
+            }
+
+            if (curPos * 2 < 100_001 && dist[curPos * 2] > dist[curPos]){
+                dist[curPos * 2] = dist[curPos];
+                dq.addFirst(curPos * 2);
             }
         }
 
-        System.out.println(dist[K]);
-    }
-
-    static class pos {
-        int idx;
-        int dist;
-        pos(int idx, int dist) {
-            this.idx = idx;
-            this.dist = dist;
-        }
+        System.out.println(fastTime);
     }
 }
