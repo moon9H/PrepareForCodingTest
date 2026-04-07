@@ -11,9 +11,10 @@ public class Main {
 		int N = Integer.parseInt(br.readLine());
 		memo = new int[N + 1];
 		Arrays.fill(memo, -1);
-        
-        if (N >= 0) memo[0] = 1;
-        if (N >= 2) memo[2] = 3;
+		
+		if (N > 0) memo[0] = 1;
+		
+		if (N >= 2) memo[2] = 3;
 		
 		System.out.println(tiling(N));
 	}
@@ -21,13 +22,13 @@ public class Main {
 	static int tiling(int n) {
 		if (n % 2 != 0) return 0;
 		
-        if (memo[n] != -1) return memo[n];
-        
-        int result = tiling(n - 2) * 3;
-        
-        for (int i = n - 4; i >= 0; i -= 2){
-            result += tiling(i) * 2;
-        }
+		if (memo[n] != -1) return memo[n];
+		
+		int result = tiling(n - 2) * 3;
+		
+		for (int i = n - 4; i >= 0; i -= 2) {
+			result += tiling(i) * 2;
+		}
 		
 		memo[n] = result;
 		
