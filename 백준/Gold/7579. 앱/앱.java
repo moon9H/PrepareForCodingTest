@@ -26,19 +26,22 @@ public class Main {
 			maxCost += cost[i];
 		}
 		
-		// dp[c] : 비용이 c일 때 확보 가능한 최대 메모리
-		int[] dp = new int[maxCost + 1];
+		int[][] dp = new int[N + 1][maxCost + 1];
 		
 		for (int i = 1; i <= N; i++) {
-			for (int c = maxCost; c >= cost[i]; c--) {
-				dp[c] = Math.max(dp[c], dp[c - cost[i]] + mem[i]);
+			for (int c = 0; c <= maxCost; c++) {
+				dp[i][c] = dp[i - 1][c];
+				
+				if (c >= cost[i]) {
+					dp[i][c] = Math.max(dp[i][c], dp[i - 1][c - cost[i]] + mem[i]);
+				}
 			}
 		}
-		
+
 		for (int c = 0; c <= maxCost; c++) {
-			if (dp[c] >= M) {
+			if (dp[N][c] >= M) {
 				System.out.println(c);
-				return;
+				break;
 			}
 		}
 	}
