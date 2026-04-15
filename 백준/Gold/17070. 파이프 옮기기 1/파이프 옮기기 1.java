@@ -1,59 +1,54 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
-    static class State {
-        int r, c, dir; // 끝점 (r,c), dir: 0가로 1세로 2대각
-        State(int r, int c, int dir) { this.r = r; this.c = c; this.dir = dir; }
-    }
-
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int N = Integer.parseInt(br.readLine());
-        int[][] board = new int[N][N];
-
-        for (int i = 0; i < N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < N; j++) board[i][j] = Integer.parseInt(st.nextToken());
-        }
-
-        long count = 0;
-        ArrayDeque<State> q = new ArrayDeque<>();
-        q.add(new State(0, 1, 0)); // 시작: 끝점(0,1), 가로
-
-        while (!q.isEmpty()) {
-            State cur = q.poll();
-
-            int r = cur.r, c = cur.c, dir = cur.dir;
-
-            // 도착 체크: 끝점이 (N-1,N-1)
-            if (r == N - 1 && c == N - 1) {
-                count++;
-                continue;
-            }
-
-            // 1) 오른쪽 이동 (가로로)
-            // 가능 dir: 가로(0), 대각(2)
-            if ((dir == 0 || dir == 2) && c + 1 < N && board[r][c + 1] == 0) {
-                q.add(new State(r, c + 1, 0));
-            }
-
-            // 2) 아래 이동 (세로로)
-            // 가능 dir: 세로(1), 대각(2)
-            if ((dir == 1 || dir == 2) && r + 1 < N && board[r + 1][c] == 0) {
-                q.add(new State(r + 1, c, 1));
-            }
-
-            // 3) 대각 이동
-            // 가능 dir: 전부(0,1,2)에서 가능하지만, 3칸 비어야 함
-            if (r + 1 < N && c + 1 < N
-                    && board[r][c + 1] == 0
-                    && board[r + 1][c] == 0
-                    && board[r + 1][c + 1] == 0) {
-                q.add(new State(r + 1, c + 1, 2));
-            }
-        }
-
-        System.out.println(count);
-    }
+	public static void main(String[] args) throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = null;
+		int N = Integer.parseInt(br.readLine());
+		int[][] map = new int[N][N];
+		for (int i = 0; i < N; i++) {
+			st = new StringTokenizer(br.readLine());
+			for (int j = 0; j < N; j++) {
+				map[i][j] = Integer.parseInt(st.nextToken());
+			}
+		}
+		
+		int[][][] dp = new int[N][N][3];	// 0 : 가로 형태, 1 : 세로 형태, 2 : 대각선
+		dp[0][1][0] = 1;
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				if ((i == 0 && j == 1) || (i == 0 && j == 0)) continue;
+				
+				// 벽이 있는 경우 삭제
+				if (map[i][j] == 1) {
+					dp[i][j][0] = dp[i][j][1] = dp[i][j][2] = 0;
+					continue;
+				}
+				
+				// (i, j) 좌표에서 가로 형태로 있을 수 있는 경우의 수
+				if (j - 1 >= 0)
+					dp[i][j][0] = dp[i][j - 1][0] + dp[i][j - 1][2];
+				
+				// (i, j) 좌표에서 세로 형태로 있을 수 있는 경우의 수
+				if (i - 1 >= 0)
+					dp[i][j][1] = dp[i - 1][j][1] + dp[i - 1][j][2];
+				
+				// (i, j) 좌표에서 대각선 형태로 있을 수 있는 경우의 수
+				if (i - 1 >= 0 && j - 1 >= 0
+						&& map[i - 1][j] != 1
+						&& map[i][j - 1] != 1)
+					dp[i][j][2] = dp[i - 1][j - 1][0] + dp[i - 1][j - 1][1] + dp[i - 1][j - 1][2];
+				
+			}
+		}
+		
+		int result = 0;
+		for (Integer i : dp[N - 1][N - 1]) {
+			result += i;
+		}
+		System.out.println(result);
+	}
 }
