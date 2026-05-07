@@ -5,12 +5,9 @@ public class Main {
 
     static int N, K;
     static int[][] map;
-    static int[][] dp;
 
     static int[] dr = {-1, 1, 0, 0};
     static int[] dc = {0, 0, -1, 1};
-
-    static List<Node> nodes = new ArrayList<>();
 
     static class Node {
         int r;
@@ -32,83 +29,76 @@ public class Main {
         K = Integer.parseInt(st.nextToken());
 
         map = new int[N][N];
-
-        int minH = Integer.MAX_VALUE;
-        int maxH = Integer.MIN_VALUE;
+        List<Node> nodes = new ArrayList<>();
 
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
 
             for (int j = 0; j < N; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
-
-                minH = Math.min(minH, map[i][j]);
-                maxH = Math.max(maxH, map[i][j]);
-
                 nodes.add(new Node(i, j, map[i][j]));
             }
         }
 
-        // 높이가 높은 칸부터 처리하기 위해 정렬
-        nodes.sort((a, b) -> b.h - a.h);
+        // 낮은 높이부터 처리
+        nodes.sort((a, b) -> a.h - b.h);
 
-        int left = 0;
-        int right = maxH - minH;
-        int answer = -1;
+        int INF = Integer.MAX_VALUE;
 
-        while (left <= right) {
-            int mid = (left + right) / 2;
+        // dp[r][c][len]
+        int[][][] dp = new int[N][N][K + 1];
 
-            if (canMakeRoad(mid)) {
-                answer = mid;
-                right = mid - 1;
-            } else {
-                left = mid + 1;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                Arrays.fill(dp[i][j], INF);
+                dp[i][j][1] = 0;
             }
         }
-
-        System.out.println(answer);
-    }
-
-    static boolean canMakeRoad(int limit) {
-        dp = new int[N][N];
-
-        int maxLength = 1;
 
         for (Node node : nodes) {
             int r = node.r;
             int c = node.c;
 
-            dp[r][c] = 1;
-
-            for (int d = 0; d < 4; d++) {
-                int nr = r + dr[d];
-                int nc = c + dc[d];
-
-                if (nr < 0 || nr >= N || nc < 0 || nc >= N) {
+            for (int len = 1; len < K; len++) {
+                if (dp[r][c][len] == INF) {
                     continue;
                 }
 
-                // 반드시 높이가 높아져야 함
-                if (map[nr][nc] <= map[r][c]) {
-                    continue;
+                for (int d = 0; d < 4; d++) {
+                    int nr = r + dr[d];
+                    int nc = c + dc[d];
+
+                    if (nr < 0 || nr >= N || nc < 0 || nc >= N) {
+                        continue;
+                    }
+
+                    // 더 높은 칸으로만 이동 가능
+                    if (map[nr][nc] <= map[r][c]) {
+                        continue;
+                    }
+
+                    int diff = map[nr][nc] - map[r][c];
+
+                    // 지금까지의 최대 높이 차와 이번 이동 높이 차 중 큰 값
+                    int nextCost = Math.max(dp[r][c][len], diff);
+
+                    dp[nr][nc][len + 1] = Math.min(dp[nr][nc][len + 1], nextCost);
                 }
-
-                // 인접한 높이 차가 limit 이하여야 함
-                if (map[nr][nc] - map[r][c] > limit) {
-                    continue;
-                }
-
-                dp[r][c] = Math.max(dp[r][c], dp[nr][nc] + 1);
-            }
-
-            maxLength = Math.max(maxLength, dp[r][c]);
-
-            if (maxLength >= K) {
-                return true;
             }
         }
 
-        return false;
+        int answer = INF;
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                answer = Math.min(answer, dp[i][j][K]);
+            }
+        }
+
+        if (answer == INF) {
+            System.out.println(-1);
+        } else {
+            System.out.println(answer);
+        }
     }
 }
