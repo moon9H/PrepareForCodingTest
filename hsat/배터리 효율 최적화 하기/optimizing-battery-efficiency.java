@@ -4,23 +4,20 @@ import java.util.*;
 public class Main {
 
     static class Module {
-        boolean[] used;
-        int score;
+        boolean[][] used; // 이 모듈이 사용하는 칸 정보
+        int score;        // 이 모듈의 점수
 
-        Module(boolean[] used, int score) {
+        Module(boolean[][] used, int score) {
             this.used = used;
             this.score = score;
         }
     }
 
     static int N, M;
-    static int total;
-    static int[] energy;
-
-    static boolean[] selected;
+    static int[][] map;
+    static boolean[][] selected;
 
     static ArrayList<Module> modules = new ArrayList<>();
-    static HashSet<String> made = new HashSet<>();
 
     static int[] dr = {-1, 1, 0, 0};
     static int[] dc = {0, 0, -1, 1};
@@ -32,37 +29,42 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
 
-        total = N * M;
-        energy = new int[total];
-        selected = new boolean[total];
+        map = new int[N][M];
+        selected = new boolean[N][M];
 
         for (int r = 0; r < N; r++) {
             st = new StringTokenizer(br.readLine());
 
             for (int c = 0; c < M; c++) {
-                int idx = r * M + c;
-                energy[idx] = Integer.parseInt(st.nextToken());
+                map[r][c] = Integer.parseInt(st.nextToken());
             }
         }
 
-        // 모든 칸을 시작점으로 DFS
-        for (int i = 0; i < total; i++) {
-            selected[i] = true;
-            dfs(1, energy[i]);
-            selected[i] = false;
+        /*
+         * 모든 칸을 시작점으로 잡고
+         * 연결된 5칸짜리 모듈을 DFS로 만든다.
+         */
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < M; c++) {
+                selected[r][c] = true;
+                dfs(1, map[r][c]);
+                selected[r][c] = false;
+            }
         }
 
         int answer = Integer.MIN_VALUE;
 
-        // 모듈 2개 선택
+        /*
+         * 만들어진 모듈 후보 중 2개를 고른다.
+         */
         for (int i = 0; i < modules.size(); i++) {
             for (int j = i + 1; j < modules.size(); j++) {
-
                 Module a = modules.get(i);
                 Module b = modules.get(j);
 
-                int overlap = countOverlap(a.used, b.used);
+                int overlap = getOverlapCount(a.used, b.used);
 
+                // 두 모듈은 정확히 2칸만 겹쳐야 한다.
                 if (overlap == 2) {
                     int score = a.score + b.score;
                     answer = Math.max(answer, score);
@@ -73,83 +75,81 @@ public class Main {
         System.out.println(answer);
     }
 
+    /*
+     * count : 현재까지 선택한 칸 수
+     * sum   : 현재까지 선택한 칸들의 점수 합
+     */
     static void dfs(int count, int sum) {
 
+        // 5칸을 선택하면 모듈 하나 완성
         if (count == 5) {
-            String key = makeKey();
-
-            // 같은 5칸 조합이 여러 순서로 만들어질 수 있으므로 중복 제거
-            if (!made.contains(key)) {
-                made.add(key);
-
-                boolean[] copy = selected.clone();
-                modules.add(new Module(copy, sum));
-            }
-
+            boolean[][] copy = copySelected();
+            modules.add(new Module(copy, sum));
             return;
         }
 
         /*
-         * 현재 선택된 칸들 중 하나에서 상하좌우로 확장한다.
-         * 그래서 항상 연결된 5칸짜리 모듈만 만들어진다.
+         * 현재 선택된 칸들의 주변으로 확장한다.
+         * 이렇게 해야 항상 연결된 모양만 만들어진다.
          */
-        boolean[] tried = new boolean[total];
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < M; c++) {
 
-        for (int cur = 0; cur < total; cur++) {
-
-            if (!selected[cur]) {
-                continue;
-            }
-
-            int r = cur / M;
-            int c = cur % M;
-
-            for (int d = 0; d < 4; d++) {
-                int nr = r + dr[d];
-                int nc = c + dc[d];
-
-                if (nr < 0 || nr >= N || nc < 0 || nc >= M) {
+                // 선택된 칸 주변에서만 확장 가능
+                if (!selected[r][c]) {
                     continue;
                 }
 
-                int next = nr * M + nc;
+                for (int d = 0; d < 4; d++) {
+                    int nr = r + dr[d];
+                    int nc = c + dc[d];
 
-                if (selected[next]) {
-                    continue;
+                    // 격자 밖이면 무시
+                    if (nr < 0 || nr >= N || nc < 0 || nc >= M) {
+                        continue;
+                    }
+
+                    // 이미 선택한 칸이면 무시
+                    if (selected[nr][nc]) {
+                        continue;
+                    }
+
+                    // 백트래킹
+                    selected[nr][nc] = true;
+                    dfs(count + 1, sum + map[nr][nc]);
+                    selected[nr][nc] = false;
                 }
-
-                // 같은 단계에서 같은 칸을 중복으로 시도하지 않기 위한 처리
-                if (tried[next]) {
-                    continue;
-                }
-
-                tried[next] = true;
-
-                selected[next] = true;
-                dfs(count + 1, sum + energy[next]);
-                selected[next] = false;
             }
         }
     }
 
-    static String makeKey() {
-        StringBuilder sb = new StringBuilder();
+    /*
+     * selected는 계속 바뀌니까
+     * 모듈로 저장할 때는 복사해서 저장해야 한다.
+     */
+    static boolean[][] copySelected() {
+        boolean[][] copy = new boolean[N][M];
 
-        for (int i = 0; i < total; i++) {
-            if (selected[i]) {
-                sb.append(i).append(",");
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < M; c++) {
+                copy[r][c] = selected[r][c];
             }
         }
 
-        return sb.toString();
+        return copy;
     }
 
-    static int countOverlap(boolean[] a, boolean[] b) {
+    /*
+     * 두 모듈이 몇 칸 겹치는지 계산
+     */
+    static int getOverlapCount(boolean[][] a, boolean[][] b) {
         int count = 0;
 
-        for (int i = 0; i < total; i++) {
-            if (a[i] && b[i]) {
-                count++;
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < M; c++) {
+                if (a[r][c] && b[r][c]) {
+                    count++;
+                }
             }
         }
 
