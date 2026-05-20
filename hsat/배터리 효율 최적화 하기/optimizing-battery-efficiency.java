@@ -4,11 +4,11 @@ import java.util.*;
 public class Main {
 
     static class Module {
-        boolean[][] used; // 이 모듈이 사용하는 칸 정보
+        boolean[][] pos; // 이 모듈이 사용하는 칸 정보
         int score;        // 이 모듈의 점수
 
-        Module(boolean[][] used, int score) {
-            this.used = used;
+        Module(boolean[][] pos, int score) {
+            this.pos = pos;
             this.score = score;
         }
     }
@@ -40,10 +40,7 @@ public class Main {
             }
         }
 
-        /*
-         * 모든 칸을 시작점으로 잡고
-         * 연결된 5칸짜리 모듈을 DFS로 만든다.
-         */
+        // 모든 칸을 시작점으로 잡고 연결된 5칸짜리 모듈을 DFS로 만듬
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < M; c++) {
                 selected[r][c] = true;
@@ -54,17 +51,16 @@ public class Main {
 
         int answer = Integer.MIN_VALUE;
 
-        /*
-         * 만들어진 모듈 후보 중 2개를 고른다.
-         */
+        // 만들어진 모듈 후보 중 2개 선택
         for (int i = 0; i < modules.size(); i++) {
             for (int j = i + 1; j < modules.size(); j++) {
                 Module a = modules.get(i);
                 Module b = modules.get(j);
 
-                int overlap = getOverlapCount(a.used, b.used);
+                int overlap = overlapCount(a.pos, b.pos);
 
-                // 두 모듈은 정확히 2칸만 겹쳐야 한다.
+                // 두 모듈은 정확히 2칸만 겹침.
+                // 2개만 겹친다고 했을 때, 두 모듈의 스코어를 더
                 if (overlap == 2) {
                     int score = a.score + b.score;
                     answer = Math.max(answer, score);
@@ -75,27 +71,30 @@ public class Main {
         System.out.println(answer);
     }
 
-    /*
-     * count : 현재까지 선택한 칸 수
-     * sum   : 현재까지 선택한 칸들의 점수 합
-     */
+    // count : 현재까지 선택한 칸 수
+    // sum   : 현재까지 선택한 칸들의 점수 합
     static void dfs(int count, int sum) {
 
-        // 5칸을 선택하면 모듈 하나 완성
+        // 5칸을 선택 시 module 하나 완성
         if (count == 5) {
-            boolean[][] copy = copySelected();
+            // selected는 계속 바뀌니까 module 저장할 때 복사해서 저장
+            boolean[][] copy = new boolean[N][M];
+            
+            for (int r = 0; r < N; r++) {
+                for (int c = 0; c < M; c++) {
+                    copy[r][c] = selected[r][c];
+                }
+            }
+            
             modules.add(new Module(copy, sum));
             return;
         }
 
-        /*
-         * 현재 선택된 칸들의 주변으로 확장한다.
-         * 이렇게 해야 항상 연결된 모양만 만들어진다.
-         */
+        // 현재 선택된 칸들 주변으로 확장
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < M; c++) {
 
-                // 선택된 칸 주변에서만 확장 가능
+                // 선택된 칸만 확장 가능
                 if (!selected[r][c]) {
                     continue;
                 }
@@ -105,15 +104,10 @@ public class Main {
                     int nc = c + dc[d];
 
                     // 격자 밖이면 무시
-                    if (nr < 0 || nr >= N || nc < 0 || nc >= M) {
+                    if (nr < 0 || nr >= N || nc < 0 || nc >= M || selected[nr][nc]) {
                         continue;
                     }
-
-                    // 이미 선택한 칸이면 무시
-                    if (selected[nr][nc]) {
-                        continue;
-                    }
-
+                    
                     // 백트래킹
                     selected[nr][nc] = true;
                     dfs(count + 1, sum + map[nr][nc]);
@@ -124,25 +118,9 @@ public class Main {
     }
 
     /*
-     * selected는 계속 바뀌니까
-     * 모듈로 저장할 때는 복사해서 저장해야 한다.
-     */
-    static boolean[][] copySelected() {
-        boolean[][] copy = new boolean[N][M];
-
-        for (int r = 0; r < N; r++) {
-            for (int c = 0; c < M; c++) {
-                copy[r][c] = selected[r][c];
-            }
-        }
-
-        return copy;
-    }
-
-    /*
      * 두 모듈이 몇 칸 겹치는지 계산
      */
-    static int getOverlapCount(boolean[][] a, boolean[][] b) {
+    static int overlapCount(boolean[][] a, boolean[][] b) {
         int count = 0;
 
         for (int r = 0; r < N; r++) {
