@@ -24,67 +24,61 @@ public class Main {
             }
         }
         
-        int[][] fromStart = new int[N][N];
-        int[][] toEnd = new int[N][N];
+        int[][] startDp = new int[N][N];
+        int[][] endDp = new int[N][N];
+        int[][][] dp = new int[N][N][T + 1];
 
-        // 1. 시작점에서 각 칸까지 올 때 얻을 수 있는 최대 이득
+        // startDp : 시작점에서 (r, c) 칸에 올 때 얻을 수 있는 최대 이득 저장
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
-                fromStart[r][c] = Integer.MIN_VALUE;
-
+                startDp[r][c] = Integer.MIN_VALUE;
+                
+                
+                // 시작점
                 if (r == 0 && c == 0) {
-                    fromStart[r][c] = board[r][c];
+                    startDp[r][c] = board[r][c];
                     continue;
                 }
-
+                
+                // 위에서 오는 경로가 최대
                 if (r > 0) {
-                    fromStart[r][c] = Math.max(fromStart[r][c], fromStart[r - 1][c] + board[r][c]);
+                    startDp[r][c] = Math.max(startDp[r][c], startDp[r - 1][c] + board[r][c]);
                 }
-
+                // 왼쪽에서 오는 경로가 최대
                 if (c > 0) {
-                    fromStart[r][c] = Math.max(fromStart[r][c], fromStart[r][c - 1] + board[r][c]);
+                    startDp[r][c] = Math.max(startDp[r][c], startDp[r][c - 1] + board[r][c]);
                 }
             }
         }
 
-        // 2. 각 칸에서 도착점까지 갈 때 얻을 수 있는 최대 이득
+        // endDp : (r, c) 칸에서 도착점까지 이동 시 얻을 수 있는 최대 이득 저장
         for (int r = N - 1; r >= 0; r--) {
             for (int c = N - 1; c >= 0; c--) {
-                toEnd[r][c] = Integer.MIN_VALUE;
-
+                endDp[r][c] = Integer.MIN_VALUE;
+                
+                // 종점
                 if (r == N - 1 && c == N - 1) {
-                    toEnd[r][c] = board[r][c];
+                    endDp[r][c] = board[r][c];
                     continue;
                 }
-
+                
+                // 아래에서 오는 경로가 최대
                 if (r + 1 < N) {
-                    toEnd[r][c] = Math.max(toEnd[r][c], toEnd[r + 1][c] + board[r][c]);
+                    endDp[r][c] = Math.max(endDp[r][c], endDp[r + 1][c] + board[r][c]);
                 }
-
+                
+                // 오른쪽에서 오는 경로 최대
                 if (c + 1 < N) {
-                    toEnd[r][c] = Math.max(toEnd[r][c], toEnd[r][c + 1] + board[r][c]);
+                    endDp[r][c] = Math.max(endDp[r][c], endDp[r][c + 1] + board[r][c]);
                 }
             }
         }
 
-        /*
-         * rewindDp[r][c][t]
-         *
-         * 의미:
-         * (r, c)에서 출발해서 정확히 t초 동안 이동했을 때,
-         * 추가로 얻을 수 있는 최대 이득
-         *
-         * 주의:
-         * 시작 칸 (r, c)의 값은 포함하지 않는다.
-         * 왜냐하면 (r, c)는 이미 fromStart에서 한 번 먹고,
-         * 시간 역행 후 toEnd에서 다시 한 번 먹기 때문이다.
-         */
-        int[][][] rewindDp = new int[N][N][T + 1];
-
+        // dp[r][c][t] -> (r, c) 칸에서 t초 이동했을 때 얻을 수 있는 최대 이득 저장
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
                 for (int t = 0; t <= T; t++) {
-                    rewindDp[r][c][t] = Integer.MIN_VALUE;
+                    dp[r][c][t] = Integer.MIN_VALUE;
                 }
             }
         }
@@ -92,53 +86,42 @@ public class Main {
         // 0초 동안 이동하면 추가로 얻는 이득은 0
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
-                rewindDp[r][c][0] = 0;
+                dp[r][c][0] = 0;
             }
         }
 
         // 정확히 t초 동안 이동하는 경우 계산
         for (int t = 1; t <= T; t++) {
-            for (int r = N - 1; r >= 0; r--) {
-                for (int c = N - 1; c >= 0; c--) {
+            for (int r = 0; r < N; r++) {
+                for (int c = 0; c < N; c++) {
 
                     // 아래로 이동
-                    if (r + 1 < N && rewindDp[r + 1][c][t - 1] != Integer.MIN_VALUE) {
-                        rewindDp[r][c][t] = Math.max(
-                            rewindDp[r][c][t],
-                            board[r + 1][c] + rewindDp[r + 1][c][t - 1]
+                    if (r + 1 < N && dp[r + 1][c][t - 1] != Integer.MIN_VALUE) {
+                        dp[r][c][t] = Math.max(
+                            dp[r][c][t],
+                            board[r + 1][c] + dp[r + 1][c][t - 1]
                         );
                     }
 
                     // 오른쪽으로 이동
-                    if (c + 1 < N && rewindDp[r][c + 1][t - 1] != Integer.MIN_VALUE) {
-                        rewindDp[r][c][t] = Math.max(
-                            rewindDp[r][c][t],
-                            board[r][c + 1] + rewindDp[r][c + 1][t - 1]
+                    if (c + 1 < N && dp[r][c + 1][t - 1] != Integer.MIN_VALUE) {
+                        dp[r][c][t] = Math.max(
+                            dp[r][c][t],
+                            board[r][c + 1] + dp[r][c + 1][t - 1]
                         );
                     }
                 }
             }
         }
 
-        // 시간 역행을 아예 사용하지 않는 경우
-        int answer = fromStart[N - 1][N - 1];
-
-        /*
-         * 시간 역행을 사용하는 경우
-         *
-         * 어떤 칸 (r, c)에서 시작해서 T초 동안 이동한다.
-         * 그 후 시간 역행으로 다시 (r, c)로 돌아온다.
-         *
-         * 총 이득:
-         * 시작점 -> (r, c)까지의 최대 이득
-         * + (r, c)에서 T초 동안 이동하며 얻는 이득
-         * + 시간 역행 후 (r, c) -> 도착점까지의 최대 이득
-         */
+        // 시간 역행을 아예 사용하지 않는게 최대일 수도 있음.
+        int answer = startDp[N - 1][N - 1];
+        
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
-                if (rewindDp[r][c][T] == Integer.MIN_VALUE) continue;
+                if (dp[r][c][T] == Integer.MIN_VALUE) continue;
 
-                int total = fromStart[r][c] + rewindDp[r][c][T] + toEnd[r][c];
+                int total = startDp[r][c] + dp[r][c][T] + endDp[r][c];
                 answer = Math.max(answer, total);
             }
         }
