@@ -90,12 +90,12 @@ public class Main {
             }
         }
 
-        // 정확히 t초 동안 이동하는 경우 계산
+        // (r, c)에서 정확히 t초 이동하는 경우 계산
         for (int t = 1; t <= T; t++) {
             for (int r = 0; r < N; r++) {
                 for (int c = 0; c < N; c++) {
-
-                    // 아래로 이동
+                    
+                    // 아래로 이동하면 board[r + 1][c] 먹고, 이동에 1초 썼으니까 아래 칸에서 (t - 1)초 이동하는 최대 
                     if (r + 1 < N && dp[r + 1][c][t - 1] != Integer.MIN_VALUE) {
                         dp[r][c][t] = Math.max(
                             dp[r][c][t],
@@ -103,7 +103,7 @@ public class Main {
                         );
                     }
 
-                    // 오른쪽으로 이동
+                    // 오른쪽으로 이동하면 board[r][c + 1] 먹고, 동일하게
                     if (c + 1 < N && dp[r][c + 1][t - 1] != Integer.MIN_VALUE) {
                         dp[r][c][t] = Math.max(
                             dp[r][c][t],
@@ -120,7 +120,9 @@ public class Main {
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
                 if (dp[r][c][T] == Integer.MIN_VALUE) continue;
-
+                
+                // 모든 (r, c) 좌표에 
+                // [시작점 -> (r, c) + (r, c)에서 시간 역행 최대값 + (r, c) -> 도착] 계산
                 int total = startDp[r][c] + dp[r][c][T] + endDp[r][c];
                 answer = Math.max(answer, total);
             }
