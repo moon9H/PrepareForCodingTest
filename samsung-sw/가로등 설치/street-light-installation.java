@@ -162,19 +162,15 @@ public class Main {
         int first = lamps.firstKey();
         int last = lamps.lastKey();
 
-        // 왼쪽 끝 1까지 밝히기 위해 필요한 2r
+        // 1부터 첫 가로등 사이를 밝히기 위해 필요한 2r
         int leftNeed = 2 * (first - 1);
 
-        // 오른쪽 끝 N까지 밝히기 위해 필요한 2r
+        // 마지막 가로등 부터 오른쪽 끝까지 밝히기 위해 필요한 2r
         int rightNeed = 2 * (N - last);
 
         // 가로등 사이를 밝히기 위해 필요한 2r
-        int middleNeed = 0;
-
-        if (!pq.isEmpty()) {
-            middleNeed = pq.peek().dist;
-        }
-
+        int middleNeed = pq.peek().dist;
+        
         return Math.max(middleNeed, Math.max(leftNeed, rightNeed));
     }
 }
