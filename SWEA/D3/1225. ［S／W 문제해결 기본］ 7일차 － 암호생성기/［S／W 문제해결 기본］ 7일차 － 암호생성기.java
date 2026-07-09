@@ -1,38 +1,45 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.StringTokenizer;
 
 public class Solution {
-	public static void main(String[] args) throws Exception{
-		int T = 10;
-		StringBuilder sb = new StringBuilder();
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		for (int testCase = 1; testCase <= T; testCase++) {
-			br.readLine();
-			ArrayDeque<Integer> queue = new ArrayDeque<Integer>();
-			StringTokenizer st = new StringTokenizer(br.readLine());
-			for (int i = 0; i < 8; i++) {
-				queue.add(Integer.parseInt(st.nextToken()));
-			}
-			int cycleMinus = 1;
-			while (true) {
-				int firstElement = queue.poll();
-				if (firstElement - cycleMinus <= 0) {
-					queue.add(0);
-					break;
-				} else {
-					queue.add(firstElement - cycleMinus);
-				}
-				cycleMinus++;
-				if (cycleMinus > 5) cycleMinus = 1;
-			}
-			sb.append("#" + testCase + " ");
-			for (Integer i : queue) {
-				sb.append(i + " ");
-			}
-			sb.append("\n");
-		}
-		System.out.println(sb.toString());
-	}
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
+        StringTokenizer st = null;
+        int T = 10;
+
+        for (int tc = 1; tc <= T; tc++) {
+            // 각 테스트 케이스 첫 줄에 테스트 케이스 번호가 들어와서 스킵용
+            br.readLine();
+            st = new StringTokenizer(br.readLine());
+
+            // 사이클 관리를 위한 변수
+            int minusCnt = 1;
+            Deque<Integer> dq = new ArrayDeque<>();
+            for (int i = 0; i < 8; i++) {
+                dq.offer(Integer.valueOf(st.nextToken()));
+            }
+            while(dq.getLast() != 0){
+                int head = dq.poll();
+                if (head - minusCnt >= 0){
+                    dq.offer(head - minusCnt++);
+                } else {
+                    dq.offer(0);
+                }
+
+                if (minusCnt == 6) minusCnt = 1;
+            }
+
+            sb.append('#').append(tc).append(' ');
+            for (Integer i : dq) {
+                sb.append(i).append(' ');
+            }
+            sb.append('\n');
+        }
+        System.out.println(sb);
+    }
 }
