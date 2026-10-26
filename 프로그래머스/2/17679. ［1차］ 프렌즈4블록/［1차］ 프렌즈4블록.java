@@ -1,3 +1,5 @@
+import java.util.*;
+
 class Solution {
     private static boolean[][] remove;
     public int solution(int m, int n, String[] board) {
@@ -22,26 +24,19 @@ class Solution {
                     board[i] = String.valueOf(line);
                 }
                 
-                for (int i = board.length - 1; i >= 0; i--) {
-                    char[] line = board[i].toCharArray();
-                    for (int j = 0; j < board[i].length(); j++) {
-                        if (board[i].charAt(j) == 'X') continue;
-                        int downPos = i;
-                        while(downPos < m - 1 && 
-                              board[downPos + 1].charAt(j) == 'X') ++downPos;
-                        if (downPos == i) continue;
-                        
-                        
-                        char[] downLine = board[downPos].toCharArray();
-                        
-                        char temp = line[j];
-                        line[j] = downLine[j];
-                        downLine[j] = temp;
-                        
-                        board[downPos] = String.valueOf(downLine);
-                        board[i] = String.valueOf(line);
+                // 열마다: 아래에서부터 남은 블록만 새 배열에 차곡차곡
+                char[][] next = new char[m][n];
+                for (char[] row : next) Arrays.fill(row, 'X');
+
+                for (int j = 0; j < n; j++) {
+                    int write = m - 1;
+                    for (int i = m - 1; i >= 0; i--) {
+                        if (board[i].charAt(j) != 'X') next[write--][j] = board[i].charAt(j);
                     }
                 }
+                
+                for (int i = 0; i < m; i++) board[i] = String.valueOf(next[i]);
+                
                 remove = new boolean[m][n];
             }
         }
