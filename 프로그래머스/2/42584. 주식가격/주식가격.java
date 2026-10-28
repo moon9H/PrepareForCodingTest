@@ -2,30 +2,23 @@ import java.util.*;
 
 class Solution {
     public int[] solution(int[] prices) {
-        int[] answer = new int[prices.length];
-        
-        // 가격 + 들어간 시점 저장하는 배열
-        Deque<int[]> dq = new ArrayDeque<>();
-        
-        for (int i = 0; i < prices.length; i++) {
-            if (dq.isEmpty()) {
-                dq.add(new int[] {prices[i], i});
-            } else {
-                while (!dq.isEmpty() && dq.getLast()[0] > prices[i]) {
-                    int[] fallPrice = dq.removeLast();
-                    answer[fallPrice[1]] = i - fallPrice[1];
-                }
-                dq.add(new int[] {prices[i], i});
+        int n = prices.length;
+        int[] answer = new int[n];
+        Deque<Integer> stack = new ArrayDeque<>();
+
+        for (int i = 0; i < n; i++) {
+            while (!stack.isEmpty() && prices[stack.peek()] > prices[i]) {
+                int idx = stack.pop();
+                answer[idx] = i - idx;
             }
-            // for (int[] a : dq) System.out.print(Arrays.toString(a));
-            // System.out.println();
+            stack.push(i);
         }
-        
-        while(!dq.isEmpty()) {
-            int[] fallPrice = dq.removeLast();
-            answer[fallPrice[1]] = prices.length - fallPrice[1] - 1;
+
+        while (!stack.isEmpty()) {
+            int idx = stack.pop();
+            answer[idx] = n - 1 - idx;
         }
-        
+
         return answer;
     }
 }
