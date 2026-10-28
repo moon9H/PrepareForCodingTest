@@ -6,13 +6,13 @@ class Solution {
         Deque<String> dq = new ArrayDeque<>();
         
         for (String s : cities) {
-            if (dq.contains(s.toLowerCase())) {
-                dq.remove(s.toLowerCase());
-                dq.offer(s.toLowerCase());
-                ++answer;
+            String city = s.toLowerCase();
+            if (dq.remove(city)) {   // remove는 지웠으면 true를 돌려줘요
+                dq.offer(city);
+                answer += 1;
             } else {
-                dq.offer(s.toLowerCase());
-                if (dq.size() > cacheSize) dq.removeFirst();
+                dq.offer(city);
+                if (dq.size() > cacheSize) dq.pollFirst();
                 answer += 5;
             }
         }
